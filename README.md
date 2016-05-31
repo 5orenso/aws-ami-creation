@@ -6,21 +6,22 @@ I know there is Puppet, Chef and other tools out there to help you build images.
 But if you just want a nice, fast and simple way to create images with a minimum of effort,
 this is the way.
 
-__An auto scaled server setup in 3 steps:__
+__An auto scaled server setup in 5 steps:__
 
-1. [create-role.sh](#user-content-get-started) : Create a role with access to create AMIs.
+1. [create-ami-creator-role.sh](#user-content-get-started) : Create a role with access to create AMIs.
 2. [create-ami.sh](#user-content-get-started) : Create an AMI for your server.
-3. [create-launch-config.sh](docs/launch-configuration.md) : Create a Launch Configuration for your Auto Scaling Group.
-4. [create-auto-scaling-group.sh](docs/auto-scaling-group.md) : Create an Auto Scaling Group.
+3. [create-server-role.sh](docs/launch-configuration.md#user-content-server-role) : Create a role for the servers.
+4. [create-launch-config.sh](docs/launch-configuration.md) : Create a Launch Configuration for your Auto Scaling Group.
+5. [create-auto-scaling-group.sh](docs/auto-scaling-group.md) : Create an Auto Scaling Group.
 
 
 ## Get started
 
 Make sure all [Prerequisite](#user-content-prerequisite) are fullfilled.
 
-__Create a new Role:__
+__Create a new ami creator role:__
 ```bash
-$ bash ./create-role.sh
+$ bash ./create-ami-creator-role.sh
 ```
 
 __To get started creating a basic Ubuntu Node.js AMI, simply type:__
