@@ -55,8 +55,8 @@ __This is how you do it:__
 
 __Clone repo:__
 ```bash
-git clone https://github.com/5orenso/aws-ami-creation.git
-cd aws-ami-creation
+$ git clone https://github.com/5orenso/aws-ami-creation.git
+$ cd aws-ami-creation
 ```
 
 That's all!
