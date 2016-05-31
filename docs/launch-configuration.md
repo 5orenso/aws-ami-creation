@@ -29,7 +29,7 @@ $ bash ./create-launch-config.sh \
 
 ## Prerequisite
 
-* [An AMI for the server](README.md)
+* [An AMI for the server](../README.md)
 
 ### Create a new security group for the servers
 

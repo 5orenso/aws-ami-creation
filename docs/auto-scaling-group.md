@@ -27,5 +27,5 @@ The servers are also visible in the [EC2 console](https://eu-west-1.console.aws.
 
 ## Prerequisite
 
-* [An AMI for the server](README.md)
+* [An AMI for the server](../README.md)
 * [AWS Launch Configuration](launch-configuration.md).
