@@ -57,7 +57,9 @@ $ bash ./create-ami.sh \
   ----------      -----    |  --------   --------  |
                             -----------------------
 ```
-You need to setup the ELB and connect it to the Auto Scaling Group.
+Next steps:
+
+* Setup the ELB and connect it to the Auto Scaling Group.
 
 
 ## Prerequisite
