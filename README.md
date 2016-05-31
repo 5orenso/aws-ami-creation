@@ -53,6 +53,11 @@ __This is how you do it:__
 * [Install the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
 * [Configure the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
 
+__Clone repo:__
+```bash
+git clone https://github.com/5orenso/aws-ami-creation.git
+cd aws-ami-creation
+```
 
 That's all!
 
