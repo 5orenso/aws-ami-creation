@@ -8,14 +8,20 @@ this is the way.
 
 __An auto scaled server setup in 3 steps:__
 
-1. [create-ami.sh](#user-content-get-started) : Create an AMI for your server.
-2. [create-launch-config.sh](launch-configuration.md) : Create a Launch Configuration for your Auto Scaling Group.
-3. [create-auto-scaling-group.sh](auto-scaling-group.md) : Create an Auto Scaling Group.
+1. [create-role.sh](#user-content-get-started) : Create a role with access to create AMIs.
+2. [create-ami.sh](#user-content-get-started) : Create an AMI for your server.
+3. [create-launch-config.sh](launch-configuration.md) : Create a Launch Configuration for your Auto Scaling Group.
+4. [create-auto-scaling-group.sh](auto-scaling-group.md) : Create an Auto Scaling Group.
 
 
 ## Get started
 
 Make sure all [Prerequisite](#user-content-prerequisite) are fullfilled.
+
+__Create a new Role:__
+```bash
+$ bash ./create-role.sh
+```
 
 __To get started creating a basic Ubuntu Node.js AMI, simply type:__
 ```bash
@@ -46,50 +52,6 @@ __This is how you do it:__
 * [Install the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
 * [Configure the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
 
-
-### Create a new Role
-
-1. Create a new role with the name `role-ami-creator`
-2. Apply `AmazonEC2ReadOnlyAccess` and `AmazonS3ReadOnlyAccess`
-3. Apply the inline policies:
-
-__policy-create-image__
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "amiCreatorCreateImage",
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateImage"
-            ],
-            "Resource": [
-                "*"
-            ]
-        }
-    ]
-}
-```
-
-__policy-create-tags__
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "amiCreatorCreateTags",
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateTags"
-            ],
-            "Resource": [
-                "*"
-            ]
-        }
-    ]
-}
-```
 
 That's all!
 
