@@ -42,6 +42,23 @@ $ bash ./create-ami.sh \
 * After 10-15 minutes your image should be ready to be used with an [AWS Launch Configuration](docs/launch-configuration.md).
 * When you've created a Launch Configuration then you can fire up the number of server you want with an [AWS Auto Scaling Groups](docs/auto-scaling-group.md).
 
+## AWS Setup overview
+
+```
+                -----       ----------------------
+               | AMI |---->| launch configuration |
+                -----       ----------------------
+                                       |
+                                       v
+                            -----------------------
+                           |  auto scaling group   |
+  ----------      -----    |  --------   --------  |
+ | internet |----| ELB |---| | server | | server | |
+  ----------      -----    |  --------   --------  |
+                            -----------------------
+```
+You need to setup the ELB and connect it to the Auto Scaling Group.
+
 
 ## Prerequisite
 
