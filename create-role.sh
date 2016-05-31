@@ -62,4 +62,11 @@ echo "Attaching inline policy amiCreatorCreateImage."
 aws iam put-role-policy $AWS_PROFILE --role-name $AWS_ROLE --policy-name amiCreatorCreateImage --policy-document file://policies/policy-ec2-create-image.json
 echo "Attaching inline policy amiCreatorCreateTags."
 aws iam put-role-policy $AWS_PROFILE --role-name $AWS_ROLE --policy-name amiCreatorCreateTags --policy-document file://policies/policy-ec2-create-tags.json
+
+CREATE_PROFILE_RESULT=$(aws iam create-instance-profile $AWS_PROFILE --instance-profile-name $AWS_ROLE)
+echo "Profile created : ${CREATE_PROFILE_RESULT}"
+
+echo "Attaching role to instance-profile."
+aws iam add-role-to-instance-profile $AWS_PROFILE --role-name $AWS_ROLE --instance-profile-name $AWS_ROLE
+
 echo "Done."

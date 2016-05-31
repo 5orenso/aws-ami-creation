@@ -137,7 +137,7 @@ echo "Running aws ec2 run-instances:"
 echo "------------------------------"
 
 # Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - ami-47a23a30
-EC2_RUN_OUTPUT=$(aws ec2 run-instances \
+EC2_RUN_OUTPUT=$(aws ec2 run-instances $AWS_PROFILE \
     --image-id ami-47a23a30 \
     --count 1 \
     --key-name $KEY_PAIR \
@@ -147,8 +147,7 @@ EC2_RUN_OUTPUT=$(aws ec2 run-instances \
     $SECURITY_GROUP \
     --instance-type $INSTANCE_TYPE \
     --instance-initiated-shutdown-behavior terminate \
-    --block-device-mappings file://block-device-mapping.json \
-    $AWS_PROFILE)
+    --block-device-mappings file://block-device-mapping.json)
 
 INSTANCE_ID=$(echo $EC2_RUN_OUTPUT | jq -r '.Instances[0].InstanceId')
 INSTANCE_IP=$(echo $EC2_RUN_OUTPUT | jq -r '.Instances[0].PrivateIpAddress')

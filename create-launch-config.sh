@@ -190,7 +190,7 @@ echo ""
 echo "Running aws autoscaling create-launch-configuration:"
 echo "----------------------------------------------------"
 
-LC_RUN_OUTPUT=$(aws autoscaling create-launch-configuration \
+LC_RUN_OUTPUT=$(aws autoscaling create-launch-configuration $AWS_PROFILE \
     --launch-configuration-name $LAUNCH_CONFIG_NAME \
     --key-name $KEY_PAIR \
     --image-id $INSTANCE_ID \
@@ -200,8 +200,7 @@ LC_RUN_OUTPUT=$(aws autoscaling create-launch-configuration \
     --instance-monitoring Enabled=$CLOUDWATCH_MONITORING \
     --$EBS_OPTIMIZED \
     --iam-instance-profile $IAM_PROFILE \
-    --block-device-mappings file://block-device-mapping.json \
-    $AWS_PROFILE)
+    --block-device-mappings file://block-device-mapping.json)
 
 echo $LC_RUN_OUTPUT
 echo 'Done!'

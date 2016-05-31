@@ -141,7 +141,7 @@ echo ""
 echo "Running aws autoscaling create-auto-scaling-group:"
 echo "--------------------------------------------------"
 
-AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group \
+AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
     --auto-scaling-group-name $AUTO_SCALING_GROUP_NAME \
     --launch-configuration-name $LAUNCH_CONFIG_NAME \
     --min-size $SIZE_MIN \
@@ -151,8 +151,7 @@ AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group \
     --vpc-zone-identifier $SUBNET_LIST \
     --termination-policies "OldestInstance" \
     --health-check-grace-period $HEALTH_CHECK_GRACE_PERIODE \
-    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME}:LC-${LAUNCH_CONFIG_NAME} \
-    $AWS_PROFILE)
+    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME}:LC-${LAUNCH_CONFIG_NAME})
 
 echo $AG_RUN_OUTPUT
 echo 'Done!'
