@@ -7,6 +7,10 @@ do
 key="$1"
 
 case $key in
+    -h|--help)
+    HELP="$2"
+    shift # past argument
+    ;;
     -c|--cloudwatch-monitoring)
     CLOUDWATCH_MONITORING="$2"
     shift # past argument
@@ -29,10 +33,6 @@ case $key in
     ;;
     -n|--launch-config-name)
     LAUNCH_CONFIG_NAME="$2"
-    shift # past argument
-    ;;
-    -s|--subnet)
-    SUBNET="$2"
     shift # past argument
     ;;
     -t|--instance-type)
@@ -61,6 +61,32 @@ case $key in
 esac
 shift # past argument or value
 done
+
+if [ ! -z "$HELP" ]; then
+    echo "bash ${0} "
+    echo "    [-h|--help 1]"
+    echo "    [-c|--cloudwatch-monitoring <set to 1 if you want monitoring>]"
+    echo "    [-e|--ebs-optimized <set to 1 if you want ebs optimized file system>]"
+    echo "     -g|--security-group <id of security group>"
+    echo "     -I|--ami-id <ami id>"
+    echo "     -i|--iam-profile <iam profile>"
+    echo "     -k|--key-pair <name of key-pair>"
+    echo "     -n|--launch-config-name <name of launch configuration>"
+    echo "    [-t|--instance-type <instance type>]"
+    echo "     -u|--user-data-file <launch configuration file>"
+    echo "    [-r|--aws-region <awd region>]"
+    echo "    [-p|--aws-profile <aws profile>]"
+    echo ""
+    echo "bash ${0}"
+    echo "    -g <id of security group>"
+    echo "    -I <ami id>"
+    echo "    -i <iam role>"
+    echo "    -k <name of key-pair>"
+    echo "    -n <name of launch config>"
+    echo "    -u <user data file>"
+    echo ""
+    exit 1;
+fi
 
 # Optional value
 if [ ! -z "$EBS_OPTIMIZED" ]; then
@@ -131,22 +157,23 @@ fi
 if [ -z "$USER_DATA_FILE" ]; then
     EXIT_MISSING=1
     echo '* Missing "user data file". Please set with:'
-    echo '    -u|--user-data-file <file>'
+    echo '    -u|--user-data-file <launch configuration file>'
     echo '    Example usage:'
-    echo '        -u launch-config-node-ami.sh'
+    echo '        -u launch-configuration/launch-config-node-ami.sh'
     echo '    Existing user data files:'
     ls launch-configurations/*.sh | cat
     echo ''
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
-    echo ''
+    echo ""
     echo "bash ${0}"
+    echo "    -g <id of security group>"
     echo "    -I <ami id>"
     echo "    -i <iam role>"
-    echo "    -g <id of security group>"
     echo "    -k <name of key-pair>"
     echo "    -n <name of launch config>"
     echo "    -u <user data file>"
+    echo ""
     exit 1;
 fi
 

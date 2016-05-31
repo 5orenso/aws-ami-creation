@@ -6,6 +6,10 @@ do
 key="$1"
 
 case $key in
+    -h|--help)
+    HELP="$2"
+    shift # past argument
+    ;;
     -b|--base-image)
     BASE_IMAGE="$2"
     shift # past argument
@@ -49,6 +53,24 @@ esac
 shift # past argument or value
 done
 
+if [ ! -z "$HELP" ]; then
+    echo "bash ${0} "
+    echo "    [-h|--help 1]"
+    echo "    [-b|--base-image <ami id>]"
+    echo "    [-g|--security-group <id of security group>]"
+    echo "     -i|--iam-profile <iam profile for image creation>"
+    echo "     -k|--key-pair <name of key-pair>"
+    echo "    [-s|--subnet <subnet id>]"
+    echo "    [-t|--instance-type <instance type>]"
+    echo "     -u|--user-data-file <ami template file>"
+    echo "    [-r|--aws-region <awd region>]"
+    echo "    [-p|--aws-profile <aws profile>]"
+    echo ""
+    echo "bash ${0} -i <iam profile> -k <name of key-pair> -u <user data file>"
+    echo ""
+    exit 1;
+fi
+
 # Default values
 AWS_REGION=${AWS_REGION:-'eu-west-1'}
 # This is the Ubuntu base image provided by AWS. No changes needed unless you want another version.
@@ -81,9 +103,9 @@ fi
 if [ -z "$USER_DATA_FILE" ]; then
     EXIT_MISSING=1
     echo '* Missing "user data file". Please set with:'
-    echo '    -u|--user-data-file <file>'
+    echo '    -u|--user-data-file <ami template file>'
     echo '    Example usage:'
-    echo '        -u ami-template-node-ami.sh'
+    echo '        -u ami-templates/ami-template-node-ami.sh'
     echo '    Existing user data files:'
     ls ami-templates/*.sh | cat
     echo ''
@@ -99,8 +121,8 @@ if [ -z "$KEY_PAIR" ]; then
     echo ''
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
-    echo ''
-    echo "bash ${0} -u <user data file> -k <name of key-pair> -i <iam profile>"
+    echo ""
+    echo "bash ${0} -i <iam profile> -k <name of key-pair> -u <user data file>"
     exit 1;
 fi
 
@@ -145,3 +167,6 @@ echo "$ ssh ubuntu@${INSTANCE_IP}"
 echo ""
 echo "View the cloud-init logfile:"
 echo "$ tail -f /var/log/cloud-init-output.log"
+echo ""
+echo "REMEBER TO SHUTDOWN THE IMAGE AFTER AMI IS CREATED! (about 10-15 min)"
+echo ""

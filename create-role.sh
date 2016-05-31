@@ -6,6 +6,10 @@ do
 key="$1"
 
 case $key in
+    -h|--help)
+    HELP="$2"
+    shift # past argument
+    ;;
     -n|--role-name)
     AWS_ROLE="$2"
     shift # past argument
@@ -24,6 +28,18 @@ case $key in
 esac
 shift # past argument or value
 done
+
+if [ ! -z "$HELP" ]; then
+    echo "bash ${0} "
+    echo "    [-h|--help 1]"
+    echo "     -n|--role-name <role name>"
+    echo "    [-r|--aws-region <awd region>]"
+    echo "    [-p|--aws-profile <aws profile>]"
+    echo ""
+    echo "bash ${0} -n <role name>"
+    echo ""
+    exit 1;
+fi
 
 # Default values
 AWS_REGION=${AWS_REGION:-'eu-west-1'}

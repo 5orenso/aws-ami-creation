@@ -6,6 +6,10 @@ do
 key="$1"
 
 case $key in
+    -h|--help)
+    HELP="$2"
+    shift # past argument
+    ;;
     -n|--auto-scaling-group-name)
     AUTO_SCALING_GROUP_NAME="$2"
     shift # past argument
@@ -30,7 +34,7 @@ case $key in
     SIZE_DESIRED="$2"
     shift # past argument
     ;;
-    -h|--health-check-grace=)
+    -h|--health-check-grace)
     HEALTH_CHECK_GRACE_PERIODE="$2"
     shift # past argument
     ;;
@@ -52,6 +56,28 @@ case $key in
 esac
 shift # past argument or value
 done
+
+if [ ! -z "$HELP" ]; then
+    echo "bash ${0} "
+    echo "    [-h|--help 1]"
+    echo "    [-c|--cooldown <seconds to wait for another autoscaling action>]"
+    echo "    [-d|--size-desired <desired servers now>]"
+    echo "    [-h|--health-check-grace <seconds between health checks>]"
+    echo "     -l|--launch-config-name <launch configuration name>"
+    echo "    [-m|--size-min <min auto scaling group size>]"
+    echo "    [-M|--size-max <max auto scaling group size>]"
+    echo "     -n|--auto-scaling-group-name <auto scaling group name>"
+    echo "     -s|--subnet-list <comma separated list of subnets>"
+    echo "    [-r|--aws-region <awd region>]"
+    echo "    [-p|--aws-profile <aws profile>]"
+    echo ""
+    echo "bash ${0}"
+    echo "    -l <name of launch config>"
+    echo "    -n <name of auto scaling group>"
+    echo "    -s <comma separated list of subnets>"
+    echo ""
+    exit 1;
+fi
 
 # Default values
 AWS_REGION=${AWS_REGION:-'eu-west-1'}
@@ -95,10 +121,10 @@ if [ -z "$SUBNET_LIST" ]; then
     echo ''
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
-    echo ''
+    echo ""
     echo "bash ${0}"
-    echo "    -n <name of auto scaling group>"
     echo "    -l <name of launch config>"
+    echo "    -n <name of auto scaling group>"
     echo "    -s <comma separated list of subnets>"
     exit 1;
 fi
