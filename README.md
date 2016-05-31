@@ -10,8 +10,8 @@ __An auto scaled server setup in 3 steps:__
 
 1. [create-role.sh](#user-content-get-started) : Create a role with access to create AMIs.
 2. [create-ami.sh](#user-content-get-started) : Create an AMI for your server.
-3. [create-launch-config.sh](launch-configuration.md) : Create a Launch Configuration for your Auto Scaling Group.
-4. [create-auto-scaling-group.sh](auto-scaling-group.md) : Create an Auto Scaling Group.
+3. [create-launch-config.sh](docs/launch-configuration.md) : Create a Launch Configuration for your Auto Scaling Group.
+4. [create-auto-scaling-group.sh](docs/auto-scaling-group.md) : Create an Auto Scaling Group.
 
 
 ## Get started
@@ -38,8 +38,8 @@ $ bash ./create-ami.sh \
 
 
 * Follow the instructions on the screen.
-* After 10-15 minutes your image should be ready to be used with an [AWS Launch Configuration](launch-configuration.md).
-* When you've created a Launch Configuration then you can fire up the number of server you want with an [AWS Auto Scaling Groups](auto-scaling-group.md).
+* After 10-15 minutes your image should be ready to be used with an [AWS Launch Configuration](docs/launch-configuration.md).
+* When you've created a Launch Configuration then you can fire up the number of server you want with an [AWS Auto Scaling Groups](docs/auto-scaling-group.md).
 
 
 ## Prerequisite

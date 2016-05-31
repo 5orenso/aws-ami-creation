@@ -83,7 +83,10 @@ if [ -z "$USER_DATA_FILE" ]; then
     echo '* Missing "user data file". Please set with:'
     echo '    -u|--user-data-file <file>'
     echo '    Example usage:'
-    echo '        -u ubuntu-node-ami.sh'
+    echo '        -u ami-template-node-ami.sh'
+    echo '    Existing user data files:'
+    ls ami-templates/*.sh | cat
+    echo ''
 fi
 if [ -z "$KEY_PAIR" ]; then
     EXIT_MISSING=1

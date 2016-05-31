@@ -135,7 +135,7 @@ if [ -z "$USER_DATA_FILE" ]; then
     echo '    Example usage:'
     echo '        -u launch-config-node-ami.sh'
     echo '    Existing user data files:'
-    ls launch-config*.sh | cat
+    ls launch-configurations/*.sh | cat
     echo ''
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
