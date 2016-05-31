@@ -69,7 +69,7 @@ if [ ! -z "$HELP" ]; then
     echo "    [-e|--ebs-optimized <set to 1 if you want ebs optimized file system>]"
     echo "     -g|--security-group <id of security group>"
     echo "     -I|--ami-id <ami id>"
-    echo "     -i|--iam-profile <iam profile>"
+    echo "     -i|--iam-profile <iam profile for the servers>"
     echo "     -k|--key-pair <name of key-pair>"
     echo "     -n|--launch-config-name <name of launch configuration>"
     echo "    [-t|--instance-type <instance type>]"
@@ -120,7 +120,7 @@ fi
 if [ -z "$IAM_PROFILE" ]; then
     EXIT_MISSING=1
     echo '* Missing "iam profile". Please set with:'
-    echo '    -i|--iam-profile <iam profile>'
+    echo '    -i|--iam-profile <iam profile for the servers>'
     echo '    Example usage:'
     echo '        -i role-node-server'
     echo '    Existing roles:'
@@ -169,7 +169,7 @@ if [ ! -z "$EXIT_MISSING" ]; then
     echo "bash ${0}"
     echo "    -g <id of security group>"
     echo "    -I <ami id>"
-    echo "    -i <iam role>"
+    echo "    -i <iam profile for the servers>"
     echo "    -k <name of key-pair>"
     echo "    -n <name of launch config>"
     echo "    -u <user data file>"
