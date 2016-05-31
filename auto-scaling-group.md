@@ -1,6 +1,6 @@
 # AWS Auto Scaling Group creation
 
-Make sure all [Prerequisite](#Prerequisite) are fullfilled.
+Make sure all [Prerequisite](#user-content-prerequisite) are fullfilled.
 
 __To get started just type:__
 ```bash

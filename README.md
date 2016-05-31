@@ -6,6 +6,8 @@ I know there is Puppet, Chef and other tools out there to help you build images.
 But if you just want a CRUD, fast and simple way to create images with a minimum of effort,
 this is the way.
 
+Make sure all [Prerequisite](#user-content-prerequisite) are fullfilled.
+
 __To get started creating a basic Ubuntu Node.js AMI, simply type:__
 ```bash
 $ bash ./create-ami.sh -u template-node-ami.sh
