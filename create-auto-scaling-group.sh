@@ -42,6 +42,10 @@ case $key in
     AWS_REGION="$2"
     shift # past argument
     ;;
+    -p|--aws-profile)
+    AWS_PROFILE="$2"
+    shift # past argument
+    ;;
     *)
     # unknown option
     ;;
@@ -56,6 +60,11 @@ SIZE_MAX=${SIZE_MAX:-1}
 SIZE_DESIRED=${SIZE_DESIRED:-1}
 COOLDOWN=${COOLDOWN:-600}
 HEALTH_CHECK_GRACE_PERIODE=${HEALTH_CHECK_GRACE_PERIODE:-60}
+
+# Optional value
+if [ ! -z "$AWS_PROFILE" ]; then
+    AWS_PROFILE="--profile ${AWS_PROFILE}"
+fi
 
 # Required values
 if [ -z "$AUTO_SCALING_GROUP_NAME" ]; then
@@ -72,7 +81,7 @@ if [ -z "$LAUNCH_CONFIG_NAME" ]; then
     echo '    Example usage:'
     echo '        -l lc-node-2016-06-01'
     echo '    Existing launch configurations:'
-    aws autoscaling describe-launch-configurations | jq -c '.LaunchConfigurations[] | { name: .LaunchConfigurationName, profile: .IamInstanceProfile, date: .CreatedTime }'
+    aws autoscaling describe-launch-configurations $AWS_PROFILE | jq -c '.LaunchConfigurations[] | { name: .LaunchConfigurationName, profile: .IamInstanceProfile, date: .CreatedTime }'
     echo ''
 fi
 if [ -z "$SUBNET_LIST" ]; then
@@ -82,7 +91,7 @@ if [ -z "$SUBNET_LIST" ]; then
     echo '    Example usage:'
     echo '        -s subnet-xxxxxx1a,subnet-xxxxxx1b,subnet-xxxxxx1c'
     echo '    Existing subnets:'
-    aws ec2 describe-subnets | jq -c '.Subnets[] | { id: .SubnetId, zone: .AvailabilityZone, vpc: .VpcId, ip: .CidrBlock, publicIP: .MapPublicIpOnLaunch, default: .DefaultForAz }'
+    aws ec2 describe-subnets $AWS_PROFILE | jq -c '.Subnets[] | { id: .SubnetId, zone: .AvailabilityZone, vpc: .VpcId, ip: .CidrBlock, publicIP: .MapPublicIpOnLaunch, default: .DefaultForAz }'
     echo ''
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
@@ -116,7 +125,8 @@ AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group \
     --vpc-zone-identifier $SUBNET_LIST \
     --termination-policies "OldestInstance" \
     --health-check-grace-period $HEALTH_CHECK_GRACE_PERIODE \
-    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME}:LC-${LAUNCH_CONFIG_NAME})
+    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME}:LC-${LAUNCH_CONFIG_NAME} \
+    $AWS_PROFILE)
 
 echo $AG_RUN_OUTPUT
 echo 'Done!'

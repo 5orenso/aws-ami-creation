@@ -38,6 +38,10 @@ case $key in
     AWS_REGION="$2"
     shift # past argument
     ;;
+    -p|--aws-profile)
+    AWS_PROFILE="$2"
+    shift # past argument
+    ;;
     *)
     # unknown option
     ;;
@@ -59,6 +63,9 @@ fi
 if [ ! -z "$SECURITY_GROUP" ]; then
     SECURITY_GROUP="--security-group-ids ${SECURITY_GROUP}"
 fi
+if [ ! -z "$AWS_PROFILE" ]; then
+    AWS_PROFILE="--profile ${AWS_PROFILE}"
+fi
 
 # Required values
 if [ -z "$IAM_PROFILE" ]; then
@@ -68,7 +75,7 @@ if [ -z "$IAM_PROFILE" ]; then
     echo '    Example usage:'
     echo '        -i role-ami-creator'
     echo '    Existing roles:'
-    aws iam list-roles | jq -c '.Roles[] | {name: .RoleName}'
+    aws iam list-roles $AWS_PROFILE | jq -c '.Roles[] | {name: .RoleName}'
     echo ''
 fi
 if [ -z "$USER_DATA_FILE" ]; then
@@ -85,7 +92,7 @@ if [ -z "$KEY_PAIR" ]; then
     echo '    Example usage:'
     echo '        -k my-key-pair'
     echo '    Existing key-pairs:'
-    aws ec2 describe-key-pairs | jq -c '.KeyPairs[] | { name: .KeyName }'
+    aws ec2 describe-key-pairs $AWS_PROFILE | jq -c '.KeyPairs[] | { name: .KeyName }'
     echo ''
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
@@ -115,7 +122,8 @@ EC2_RUN_OUTPUT=$(aws ec2 run-instances \
     $SECURITY_GROUP \
     --instance-type $INSTANCE_TYPE \
     --instance-initiated-shutdown-behavior terminate \
-    --block-device-mappings file://block-device-mapping.json)
+    --block-device-mappings file://block-device-mapping.json \
+    $AWS_PROFILE)
 
 INSTANCE_ID=$(echo $EC2_RUN_OUTPUT | jq -r '.Instances[0].InstanceId')
 INSTANCE_IP=$(echo $EC2_RUN_OUTPUT | jq -r '.Instances[0].PrivateIpAddress')

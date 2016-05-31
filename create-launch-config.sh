@@ -51,6 +51,10 @@ case $key in
     AWS_REGION="$2"
     shift # past argument
     ;;
+    -p|--aws-profile)
+    AWS_PROFILE="$2"
+    shift # past argument
+    ;;
     *)
     # unknown option
     ;;
@@ -64,6 +68,9 @@ if [ ! -z "$EBS_OPTIMIZED" ]; then
 fi
 if [ ! -z "$CLOUDWATCH_MONITORING" ]; then
     CLOUDWATCH_MONITORING='true'
+fi
+if [ ! -z "$AWS_PROFILE" ]; then
+    AWS_PROFILE="--profile ${AWS_PROFILE}"
 fi
 
 # Default values
@@ -81,7 +88,7 @@ if [ -z "$INSTANCE_ID" ]; then
     echo '    Example usage:'
     echo '        -I ami-MyNodeAmi'
     echo '    Existing images:'
-    aws ec2 describe-images --owners self | jq -c '.Images[] | { id: .ImageId, name: .Name }'
+    aws ec2 describe-images --owners self $AWS_PROFILE | jq -c '.Images[] | { id: .ImageId, name: .Name }'
     echo ''
 fi
 if [ -z "$IAM_PROFILE" ]; then
@@ -91,7 +98,7 @@ if [ -z "$IAM_PROFILE" ]; then
     echo '    Example usage:'
     echo '        -i role-node-server'
     echo '    Existing roles:'
-    aws iam list-roles | jq -c '.Roles[] | {name: .RoleName}'
+    aws iam list-roles $AWS_PROFILE | jq -c '.Roles[] | {name: .RoleName}'
     echo ''
 fi
 if [ -z "$KEY_PAIR" ]; then
@@ -101,7 +108,7 @@ if [ -z "$KEY_PAIR" ]; then
     echo '    Example usage:'
     echo '        -k my-key-pair'
     echo '    Existing key-pairs:'
-    aws ec2 describe-key-pairs | jq -c '.KeyPairs[] | { name: .KeyName }'
+    aws ec2 describe-key-pairs $AWS_PROFILE | jq -c '.KeyPairs[] | { name: .KeyName }'
     echo ''
 fi
 if [ -z "$LAUNCH_CONFIG_NAME" ]; then
@@ -118,7 +125,7 @@ if [ -z "$SECURITY_GROUP" ]; then
     echo '    Example usage:'
     echo '        -g sg-12345678'
     echo '    Existing security groups:'
-    aws ec2 describe-security-groups | jq -c '.SecurityGroups[] | {id: .GroupId, name: .GroupName, desc: .Description}'
+    aws ec2 describe-security-groups $AWS_PROFILE | jq -c '.SecurityGroups[] | {id: .GroupId, name: .GroupName, desc: .Description}'
     echo ''
 fi
 if [ -z "$USER_DATA_FILE" ]; then
@@ -166,7 +173,8 @@ LC_RUN_OUTPUT=$(aws autoscaling create-launch-configuration \
     --instance-monitoring Enabled=$CLOUDWATCH_MONITORING \
     --$EBS_OPTIMIZED \
     --iam-instance-profile $IAM_PROFILE \
-    --block-device-mappings file://block-device-mapping.json)
+    --block-device-mappings file://block-device-mapping.json \
+    $AWS_PROFILE)
 
 echo $LC_RUN_OUTPUT
 echo 'Done!'
