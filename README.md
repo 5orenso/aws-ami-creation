@@ -47,8 +47,13 @@ $ bash ./create-ami.sh \
 
 Before you can run the command to create a new AMI you need to register an AWS account, 
 install the AWS CLI, create a new role for the creator and install [jq](https://stedolan.github.io/jq/download/).
+
+_If you have brew:_
+```bash
+$ brew install jq
+```
  
-__This is how you do it:__
+__Get started with an AWS Account:__
 * [Setup an Amazon Web Services account](https://aws.amazon.com/)
 * [Install the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
 * [Configure the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
