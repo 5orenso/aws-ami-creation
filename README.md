@@ -1,10 +1,19 @@
 # AWS AMI Creation
 
-A simple approach to create images you need for your AWS servers.
+A simple approach to create Amazon Machine Images (AMI) you need for your AWS servers.
 
 I know there is Puppet, Chef and other tools out there to help you build images. 
 But if you just want a nice, fast and simple way to create images with a minimum of effort,
 this is the way.
+
+__An auto scaled server setup in 3 steps:__
+
+1. [create-ami.sh](#user-content-get-started) : Create an AMI for your server.
+2. [create-launch-config.sh](launch-configuration.md) : Create a Launch Configuration for your Auto Scaling Group.
+3. [create-auto-scaling-group.sh](auto-scaling-group.md) : Create an Auto Scaling Group.
+
+
+## Get started
 
 Make sure all [Prerequisite](#user-content-prerequisite) are fullfilled.
 
