@@ -138,6 +138,7 @@ echo "------------------------------"
 
 # Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - ami-47a23a30
 EC2_RUN_OUTPUT=$(aws ec2 run-instances $AWS_PROFILE \
+    --region $AWS_REGION \
     --image-id ami-47a23a30 \
     --count 1 \
     --key-name $KEY_PAIR \
