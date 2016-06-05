@@ -42,10 +42,9 @@ apt-get update
 apt-get install awscli git make g++ --yes
 
 # Tag instance
-aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=$INSTANCE_NAME --region eu-west-1
+aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
 
 sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
-
 NODE_VERSION="6.1.0"
 sudo curl -o /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
 cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
@@ -61,7 +60,7 @@ cat > /tmp/awslogs.conf <<'EOF'
 [general]
 state_file = /var/awslogs/state/agent-state
 EOF
-sudo python ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
+python ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
 
 IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1
