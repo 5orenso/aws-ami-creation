@@ -35,6 +35,10 @@ case $key in
     LAUNCH_CONFIG_NAME="$2"
     shift # past argument
     ;;
+    -s|--secret-user-data-file)
+    SECRET_USER_DATA_FILE="$2"
+    shift # past argument
+    ;;
     -t|--instance-type)
     INSTANCE_TYPE="$2"
     shift # past argument
@@ -177,6 +181,10 @@ if [ ! -z "$EXIT_MISSING" ]; then
     exit 1;
 fi
 
+if [ ! -z "$SECRET_USER_DATA_FILE" ]; then
+    cat $SECRET_USER_DATA_FILE $USER_DATA_FILE > /tmp/$LAUNCH_CONFIG_NAME
+    USER_DATA_FILE="/tmp/${LAUNCH_CONFIG_NAME}"
+fi
 
 echo "CLOUDWATCH_MONITORING : ${CLOUDWATCH_MONITORING}"
 echo "EBS_OPTIMIZED         : ${EBS_OPTIMIZED}"

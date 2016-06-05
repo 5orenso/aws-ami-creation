@@ -126,6 +126,7 @@ if [ ! -z "$EXIT_MISSING" ]; then
     exit 1;
 fi
 
+echo "AWS_PROFILE     : ${AWS_PROFILE:-'default'}"
 echo "BASE_IMAGE      : ${BASE_IMAGE}"
 echo "IAM_PROFILE     : ${IAM_PROFILE}"
 echo "INSTANCE_TYPE   : ${INSTANCE_TYPE}"
@@ -167,5 +168,5 @@ echo ""
 echo "View the cloud-init logfile:"
 echo "$ tail -f /var/log/cloud-init-output.log"
 echo ""
-echo "REMEBER TO SHUTDOWN THE IMAGE AFTER AMI IS CREATED! (about 10-15 min)"
+echo "REMEBER TO SHUTDOWN THE AMI CREATOR SERVER (${INSTANCE_ID}) AFTER AMI IS CREATED! (about 10-15 min)"
 echo ""
