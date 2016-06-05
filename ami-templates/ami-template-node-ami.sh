@@ -22,7 +22,7 @@ get_new_image_name() {
     IMAGE_STAMP=`date +%Y-%m-%d`
     IMAGE_BASE_NAME=$1-${IMAGE_STAMP}
     IMAGE_NEXT_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_BASE_NAME}*" \
-        | jq -cr '.Images[].Name' \
+        | jq -r '.Images[].Name' \
         | cut -d'_' -f2 \
         | get_next_num)
 
@@ -39,7 +39,7 @@ EC2_INSTANCE_ID=`get_ec2_instance_id`
 apt-get update
 
 # AWS tools and other software
-apt-get install awscli git make g++ --yes
+apt-get install jq awscli git make g++ --yes
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1

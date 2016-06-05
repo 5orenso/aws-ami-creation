@@ -21,8 +21,8 @@ get_next_num() {
 get_new_image_name() {
     IMAGE_STAMP=`date +%Y-%m-%d`
     IMAGE_BASE_NAME=$1-${IMAGE_STAMP}
-    IMAGE_NEXT_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_BASE_NAME}*" \
-        | jq -cr '.Images[].Name' \
+    IMAGE_NEXT_ID=$(aws ec2 describe-images --region eu-west-1 --owners self --filters "Name=name,Values=${IMAGE_BASE_NAME}*" \
+        | jq -r '.Images[].Name' \
         | cut -d'_' -f2 \
         | get_next_num)
 
@@ -43,7 +43,7 @@ debconf-set-selections <<< "postfix postfix/mailname string www.flyfisheurope.co
 debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
 apt-get install postfix --yes
 
-apt-get install awscli git make g++ dstat ncftp fail2ban logwatch zip unzip imagemagick imagemagick-common apache2 libapache2-mod-php5 varnish --yes
+apt-get install jq awscli git make g++ dstat ncftp fail2ban logwatch zip unzip imagemagick imagemagick-common apache2 libapache2-mod-php5 varnish --yes
 apt-get install php5 php5-curl php5-dev php5-cli php-pear php5-imagick php5-gd --yes
 
 # Tag instance
