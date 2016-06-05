@@ -93,19 +93,25 @@ aws s3 cp s3://ffe-static-web/php/PHPExcel_1.8.0.zip /var/www/lib/PHPExcel_1.8.0
 unzip /var/www/lib/PHPExcel_1.8.0.zip -d /var/www/lib/
 ln -s /var/www/lib/Classes /var/www/lib/PHPExcel
 
+mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.ini.old
 ln -s /srv/config/ffe/php5/apache2/php.ini /etc/php5/apache2/php.ini
 ln -s /srv/config/ffe/php5/mods-available/mongo.ini /etc/php5/apache2/conf.d/20-mongo.ini
 ln -s /srv/config/ffe/php5/mods-available/mongo.ini /etc/php5/cli/conf.d/20-mongo.ini
 
 # Fix apache configs.
+mv /etc/apache2/apache2.conf /etc/apache2/apache2.conf.old
 ln -s /srv/config/ffe/apache2/apache2.conf /etc/apache2/apache2.conf
+mv /etc/apache2/ports.conf /etc/apache2/ports.conf.old
 ln -s /srv/config/ffe/apache2/ports.conf /etc/apache2/ports.conf
 ln -s /srv/config/ffe/apache2/sites-enabled/dealer.flyfisheurope.com /etc/apache2/sites-enabled/dealer.flyfisheurope.com
 ln -s /srv/config/ffe/apache2/sites-enabled/www.flyfisheurope.com /etc/apache2/sites-enabled/www.flyfisheurope.com
 ln -s /srv/config/ffe/apache2/sites-enabled/dev.zu.no /etc/apache2/sites-enabled/dev.zu.no
 
 # Fix varnish config.
+mv /etc/varnish/default.vcl /etc/varnish/default.vcl.old
 ln -s /srv/config/ffe/varnish/default.vcl /etc/varnish/default.vcl
+
+mv /etc/default/varnish /etc/default/varnish.old
 ln -s /srv/config/ffe/etc/default/varnish /etc/default/varnish
 
 # Fix fail2ban config
