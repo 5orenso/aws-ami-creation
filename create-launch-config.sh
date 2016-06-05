@@ -78,6 +78,7 @@ if [ ! -z "$HELP" ]; then
     echo "     -n|--launch-config-name <name of launch configuration>"
     echo "    [-t|--instance-type <instance type>]"
     echo "     -u|--user-data-file <launch configuration file>"
+    echo "    [-s|--secret-user-data-file <secret launch configuration file>]"
     echo "    [-r|--aws-region <awd region>]"
     echo "    [-p|--aws-profile <aws profile>]"
     echo ""
@@ -88,6 +89,7 @@ if [ ! -z "$HELP" ]; then
     echo "    -k <name of key-pair>"
     echo "    -n <name of launch config>"
     echo "    -u <user data file>"
+    echo "    -s <secret user data file>"
     echo ""
     exit 1;
 fi
@@ -113,6 +115,7 @@ INSTANCE_TYPE=${INSTANCE_TYPE:-'m3.medium'}
 # Required values
 if [ -z "$INSTANCE_ID" ]; then
     EXIT_MISSING=1
+    echo ''
     echo '* Missing "ami instance id". Please set with:'
     echo '    -I|--ami-id <ami id>'
     echo '    Example usage:'
@@ -123,6 +126,7 @@ if [ -z "$INSTANCE_ID" ]; then
 fi
 if [ -z "$IAM_PROFILE" ]; then
     EXIT_MISSING=1
+    echo ''
     echo '* Missing "iam profile". Please set with:'
     echo '    -i|--iam-profile <iam profile for the servers>'
     echo '    Example usage:'
@@ -133,6 +137,7 @@ if [ -z "$IAM_PROFILE" ]; then
 fi
 if [ -z "$KEY_PAIR" ]; then
     EXIT_MISSING=1
+    echo ''
     echo '* Missing "key-pair". Please set with:'
     echo '    -k|--key-pair <name of key-pair>'
     echo '    Example usage:'
@@ -143,6 +148,7 @@ if [ -z "$KEY_PAIR" ]; then
 fi
 if [ -z "$LAUNCH_CONFIG_NAME" ]; then
     EXIT_MISSING=1
+    echo ''
     echo '* Missing "launch-config-name". Please set with:'
     echo '    -n|--launch-config-name <name of launch config>'
     echo '    Example usage:'
@@ -150,6 +156,7 @@ if [ -z "$LAUNCH_CONFIG_NAME" ]; then
 fi
 if [ -z "$SECURITY_GROUP" ]; then
     EXIT_MISSING=1
+    echo ''
     echo '* Missing "security-group". Please set with:'
     echo '    -g|--security-group <id of security group>'
     echo '    Example usage:'
@@ -160,6 +167,7 @@ if [ -z "$SECURITY_GROUP" ]; then
 fi
 if [ -z "$USER_DATA_FILE" ]; then
     EXIT_MISSING=1
+    echo ''
     echo '* Missing "user data file". Please set with:'
     echo '    -u|--user-data-file <launch configuration file>'
     echo '    Example usage:'
@@ -177,6 +185,7 @@ if [ ! -z "$EXIT_MISSING" ]; then
     echo "    -k <name of key-pair>"
     echo "    -n <name of launch config>"
     echo "    -u <user data file>"
+    echo "    -s <secret user data file>"
     echo ""
     exit 1;
 fi
