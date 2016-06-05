@@ -54,7 +54,7 @@ mkdir /var/www/www.flyfisheurope.com/sizechart/
 mkdir /var/www/www.flyfisheurope.com/test/
 
 # Files from s3
-/usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1 > /var/log/ffe-static-web-images.log &
+/usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/fancyBox/ /var/www/www.flyfisheurope.com/fancyBox/ --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/img/ /var/www/www.flyfisheurope.com/img/ --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/jafw/ /var/www/www.flyfisheurope.com/jafw/ --region eu-west-1
