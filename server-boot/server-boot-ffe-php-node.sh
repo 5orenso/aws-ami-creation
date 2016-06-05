@@ -102,6 +102,7 @@ ln -s /srv/config/ffe/php5/mods-available/mongo.ini /etc/php5/cli/conf.d/20-mong
 mv /etc/apache2/apache2.conf /etc/apache2/apache2.conf.old
 ln -s /srv/config/ffe/apache2/apache2.conf /etc/apache2/apache2.conf
 mv /etc/apache2/ports.conf /etc/apache2/ports.conf.old
+touch /etc/apache2/httpd.conf
 ln -s /srv/config/ffe/apache2/ports.conf /etc/apache2/ports.conf
 ln -s /srv/config/ffe/apache2/sites-enabled/dealer.flyfisheurope.com /etc/apache2/sites-enabled/dealer.flyfisheurope.com
 ln -s /srv/config/ffe/apache2/sites-enabled/www.flyfisheurope.com /etc/apache2/sites-enabled/www.flyfisheurope.com
