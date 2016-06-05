@@ -108,28 +108,44 @@ ln -s /srv/config/ffe/apache2/sites-enabled/dev.zu.no /etc/apache2/sites-enabled
 ln -s /srv/config/ffe/varnish/default.vcl /etc/varnish/default.vcl
 ln -s /srv/config/ffe/etc/default/varnish /etc/default/varnish
 
+# Fix fail2ban config
+ln -s /srv/config/ffe/etc/fail2ban/jail.conf /etc/fail2ban/.
+
+# Fix logrotate config
+ln -s /srv/config/ffe/etc/logrotate.d/apache2 /etc/logrotate.d/.
+ln -s /srv/config/ffe/etc/logrotate.d/fail2ban /etc/logrotate.d/.
+ln -s /srv/config/ffe/etc/logrotate.d/zu /etc/logrotate.d/.
+ln -s /srv/config/ffe/etc/logrotate.d/mail /etc/logrotate.d/.
+ln -s /srv/config/ffe/etc/logrotate.d/syslog /etc/logrotate.d/.
+
+# Fix postfix config. Sending email via sendgrid.
+mv /etc/postfix/main.cf /etc/postfix/main.cf.old
+ln -s /srv/config/ffe/etc/postfix/main.cf /etc/postfix/main.cf
+service postfix restart
+
 # Logs to AWS Cloudwatch
 cat > /var/awslogs/etc/awslogs.conf <<'EOF'
 [general]
 state_file = /var/awslogs/state/agent-state
 
-[/tmp/apilog.log]
+[/var/log/zu.log]
 datetime_format = %Y-%m-%d %H:%M:%S
-file = /var/log/simple-blog/simple-blog-next.telia.no.log
+file = /var/log/zu.log
 buffer_duration = 5000
 log_stream_name = {instance_id}
 initial_position = start_of_file
 log_group_name = api/apilog.log
 
-[/tmp/request.log]
+[/var/log/zu.sys.log]
 datetime_format = %Y-%m-%d %H:%M:%S
-file = /srv/simple-blog/logs/web-access.log
+file = /var/log/zu.sys.log
 buffer_duration = 5000
 log_stream_name = {instance_id}
 initial_position = start_of_file
 log_group_name = api/request.log
 EOF
 service awslogs restart
+
 
 # Run the applications:
 service apache2 restart
@@ -139,15 +155,16 @@ service varnish restart
 read -r -d '' CRONTAB_LINES <<- EOM
 MAILTO=sorenso@gmail.com
 0 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/images/ s3://ffe-static-web/images/ --exclude "cache/*" >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/fancyBox/ s3://ffe-static-web/fancyBox/ >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/img/ s3://ffe-static-web/img/ >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/jafw/ s3://ffe-static-web/jafw/ >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 sync /var/www/dev.zu.no/sizechart/ s3://ffe-static-web/sizechart/ >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 sync /var/www/dev.zu.no/test/ s3://ffe-static-web/test/ >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 cp /var/www/www.flyfisheurope.com/index.html s3://ffe-static-web/index.html >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 cp /var/www/www.flyfisheurope.com/favicon.ico s3://ffe-static-web/favicon.ico >> /home/ubuntu/aws-s3-sync.log
-0 2 * * * /usr/local/bin/aws s3 cp /var/www/dev.zu.no/img.php s3://ffe-static-web/img.php >> /home/ubuntu/aws-s3-sync.log
+10 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/fancyBox/ s3://ffe-static-web/fancyBox/ >> /home/ubuntu/aws-s3-sync.log
+20 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/img/ s3://ffe-static-web/img/ >> /home/ubuntu/aws-s3-sync.log
+30 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/jafw/ s3://ffe-static-web/jafw/ >> /home/ubuntu/aws-s3-sync.log
+40 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ >> /home/ubuntu/aws-s3-sync.log
+50 1 * * * /usr/local/bin/aws s3 sync /var/www/dev.zu.no/sizechart/ s3://ffe-static-web/sizechart/ >> /home/ubuntu/aws-s3-sync.log
+10 2 * * * /usr/local/bin/aws s3 sync /var/www/dev.zu.no/test/ s3://ffe-static-web/test/ >> /home/ubuntu/aws-s3-sync.log
+20 2 * * * /usr/local/bin/aws s3 cp /var/www/www.flyfisheurope.com/index.html s3://ffe-static-web/index.html >> /home/ubuntu/aws-s3-sync.log
+30 2 * * * /usr/local/bin/aws s3 cp /var/www/www.flyfisheurope.com/favicon.ico s3://ffe-static-web/favicon.ico >> /home/ubuntu/aws-s3-sync.log
+40 2 * * * /usr/local/bin/aws s3 cp /var/www/dev.zu.no/img.php s3://ffe-static-web/img.php >> /home/ubuntu/aws-s3-sync.log
 
 EOM
+
 (crontab -l; echo "$CRONTAB_LINES" ) | crontab -u ubuntu -
