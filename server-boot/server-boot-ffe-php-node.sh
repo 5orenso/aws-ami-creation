@@ -35,12 +35,41 @@ chmod g+s /var/www/
 
 mkdir /var/www/lib/
 
+
+# www.flyfisheurope.com
+git clone $GIT_REPO_FFE_CMS /var/www/www.flyfisheurope.com/zu/
+mkdir -p /var/www/www.flyfisheurope.com/images/cache/
+ln -s /srv/config/ffe/FFE-CMS/www.flyfisheurope.com/main.ini /var/www/www.flyfisheurope.com/zu/config/main.ini
+ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/css /var/www/www.flyfisheurope.com/css
+ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/js /var/www/www.flyfisheurope.com/js
+ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/posters /var/www/www.flyfisheurope.com/posters
+ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/img /var/www/www.flyfisheurope.com/imgs
+ln -s /var/www/www.flyfisheurope.com/zu/qrcodes /var/www/www.flyfisheurope.com/qrcodes
+
+mkdir /var/www/www.flyfisheurope.com/fancyBox/
+mkdir /var/www/www.flyfisheurope.com/img/
+mkdir /var/www/www.flyfisheurope.com/jafw/
+mkdir /var/www/www.flyfisheurope.com/jquery-file-upload/
+mkdir /var/www/www.flyfisheurope.com/sizechart/
+mkdir /var/www/www.flyfisheurope.com/test/
+
+# Files from s3
+/usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/fancyBox/ /var/www/www.flyfisheurope.com/fancyBox/ --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/img/ /var/www/www.flyfisheurope.com/img/ --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/jafw/ /var/www/www.flyfisheurope.com/jafw/ --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/jquery-file-upload/ /var/www/www.flyfisheurope.com/jquery-file-upload/ --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/sizechart/ /var/www/www.flyfisheurope.com/sizechart/ --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/test/ /var/www/www.flyfisheurope.com/test/ --region eu-west-1
+/usr/bin/aws s3 cp s3://ffe-static-web/index.html /var/www/www.flyfisheurope.com/index.html --region eu-west-1
+/usr/bin/aws s3 cp s3://ffe-static-web/index_dealer.html /var/www/www.flyfisheurope.com/index_dealer.html --region eu-west-1
+/usr/bin/aws s3 cp s3://ffe-static-web/favicon.ico /var/www/www.flyfisheurope.com/favicon.ico --region eu-west-1
+/usr/bin/aws s3 cp s3://ffe-static-web/img.php /var/www/www.flyfisheurope.com/img.php --region eu-west-1
+
+
 # dev.zu.no
-mkdir -p /var/www/dev.zu.no/zu/images/
 git clone $GIT_REPO_FFE_CMS /var/www/dev.zu.no/zu/
-mkdir -p /var/www/dev.zu.no/images/cache/
-ln -s /var/www/dev.zu.no/zu/images/index.php /var/www/dev.zu.no/images/index.php
-ln -s /var/www/dev.zu.no/zu/images/pix.gif /var/www/dev.zu.no/images/pig.gif
+ln -s /var/www/www.flyfisheurope.com/images /var/www/dev.zu.no/.
 ln -s /srv/config/ffe/FFE-CMS/dev.zu.no/main.ini /var/www/dev.zu.no/zu/config/main.ini
 ln -s /var/www/dev.zu.no/zu/view/consumer_web/css /var/www/dev.zu.no/css
 ln -s /var/www/dev.zu.no/zu/view/consumer_web/js /var/www/dev.zu.no/js
@@ -49,30 +78,25 @@ ln -s /var/www/dev.zu.no/zu/view/consumer_web/img /var/www/dev.zu.no/imgs
 ln -s /var/www/dev.zu.no/zu/qrcodes /var/www/dev.zu.no/qrcodes
 
 # dealer.flyfisheurope.com
-mkdir -p /var/www/dealer.flyfisheurope.com/zu/images/
 git clone $GIT_REPO_FFE_CMS /var/www/dealer.flyfisheurope.com/zu/
-mkdir -p /var/www/dealer.flyfisheurope.com/images/cache/
-ln -s /var/www/dealer.flyfisheurope.com/zu/images/index.php /var/www/dealer.flyfisheurope.com/images/index.php
-ln -s /var/www/dealer.flyfisheurope.com/zu/images/pix.gif /var/www/dealer.flyfisheurope.com/images/pig.gif
+ln -s /var/www/www.flyfisheurope.com/images /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/fancyBox /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/img /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/jafw /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/jquery-file-upload /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/sizechart /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/test /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/index.html /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/index_dealer.html /var/www/dealer.flyfisheurope.com/index.html
+ln -s /var/www/www.flyfisheurope.com/favicon.ico /var/www/dealer.flyfisheurope.com/.
+ln -s /var/www/www.flyfisheurope.com/img.php /var/www/dealer.flyfisheurope.com/.
+
 ln -s /srv/config/ffe/FFE-CMS/dealer.flyfisheurope.com/main.ini /var/www/dealer.flyfisheurope.com/zu/config/main.ini
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/css /var/www/dealer.flyfisheurope.com/css
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/js /var/www/dealer.flyfisheurope.com/js
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/posters /var/www/dealer.flyfisheurope.com/posters
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/img /var/www/dealer.flyfisheurope.com/imgs
 ln -s /var/www/dealer.flyfisheurope.com/zu/qrcodes /var/www/dealer.flyfisheurope.com/qrcodes
-
-# www.flyfisheurope.com
-mkdir -p /var/www/www.flyfisheurope.com/zu/images/
-git clone $GIT_REPO_FFE_CMS /var/www/www.flyfisheurope.com/zu/
-mkdir -p /var/www/www.flyfisheurope.com/images/cache/
-ln -s /var/www/www.flyfisheurope.com/zu/images/index.php /var/www/www.flyfisheurope.com/images/index.php
-ln -s /var/www/www.flyfisheurope.com/zu/images/pix.gif /var/www/www.flyfisheurope.com/images/pig.gif
-ln -s /srv/config/ffe/FFE-CMS/www.flyfisheurope.com/main.ini /var/www/www.flyfisheurope.com/zu/config/main.ini
-ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/css /var/www/www.flyfisheurope.com/css
-ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/js /var/www/www.flyfisheurope.com/js
-ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/posters /var/www/www.flyfisheurope.com/posters
-ln -s /var/www/www.flyfisheurope.com/zu/view/consumer_web/img /var/www/www.flyfisheurope.com/imgs
-ln -s /var/www/www.flyfisheurope.com/zu/qrcodes /var/www/www.flyfisheurope.com/qrcodes
 
 # Chown
 chown -R www-data.www-data /var/www/
@@ -161,16 +185,16 @@ service varnish restart
 # Cron - from the repo
 read -r -d '' CRONTAB_LINES <<- EOM
 MAILTO=sorenso@gmail.com
-0 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/images/ s3://ffe-static-web/images/ --exclude "cache/*" >> /home/ubuntu/aws-s3-sync.log
-10 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/fancyBox/ s3://ffe-static-web/fancyBox/ >> /home/ubuntu/aws-s3-sync.log
-20 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/img/ s3://ffe-static-web/img/ >> /home/ubuntu/aws-s3-sync.log
-30 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/jafw/ s3://ffe-static-web/jafw/ >> /home/ubuntu/aws-s3-sync.log
-40 1 * * * /usr/local/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ >> /home/ubuntu/aws-s3-sync.log
-50 1 * * * /usr/local/bin/aws s3 sync /var/www/dev.zu.no/sizechart/ s3://ffe-static-web/sizechart/ >> /home/ubuntu/aws-s3-sync.log
-10 2 * * * /usr/local/bin/aws s3 sync /var/www/dev.zu.no/test/ s3://ffe-static-web/test/ >> /home/ubuntu/aws-s3-sync.log
-20 2 * * * /usr/local/bin/aws s3 cp /var/www/www.flyfisheurope.com/index.html s3://ffe-static-web/index.html >> /home/ubuntu/aws-s3-sync.log
-30 2 * * * /usr/local/bin/aws s3 cp /var/www/www.flyfisheurope.com/favicon.ico s3://ffe-static-web/favicon.ico >> /home/ubuntu/aws-s3-sync.log
-40 2 * * * /usr/local/bin/aws s3 cp /var/www/dev.zu.no/img.php s3://ffe-static-web/img.php >> /home/ubuntu/aws-s3-sync.log
+0 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/images/             s3://ffe-static-web/images/ --exclude "cache/*" --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/fancyBox/           s3://ffe-static-web/fancyBox/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+20 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/img/                s3://ffe-static-web/img/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+30 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+40 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+50 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 2 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+20 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+30 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/favicon.ico         s3://ffe-static-web/favicon.ico --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+40 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/img.php             s3://ffe-static-web/img.php --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 
 EOM
 
