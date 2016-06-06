@@ -151,7 +151,7 @@ AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
     --vpc-zone-identifier $SUBNET_LIST \
     --termination-policies "OldestInstance" \
     --health-check-grace-period $HEALTH_CHECK_GRACE_PERIODE \
-    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME}:LC-${LAUNCH_CONFIG_NAME})
+    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME})
 
 echo $AG_RUN_OUTPUT
 echo 'Done!'
