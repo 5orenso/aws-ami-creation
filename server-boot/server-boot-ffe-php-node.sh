@@ -112,7 +112,7 @@ chown www-data.www-data /var/run/FFE-CMS/
 
 # Install PHP stuff
 # curl -o /var/www/lib/v1.24.1.tar.gz https://codeload.github.com/twigphp/Twig/tar.gz/v1.24.1
-aws s3 cp s3://ffe-static-web/php/v1.24.1.tar.gz /var/www/lib/v1.24.1.tar.gz
+aws s3 cp s3://ffe-static-web/php/v1.24.1.tar.gz /var/www/lib/v1.24.1.tar.gz --region eu-west-1
 tar -zxvf /var/www/lib/v1.24.1.tar.gz -C /var/www/lib/
 ln -s /var/www/lib/Twig-1.24.1 /var/www/lib/Twig
 # curl -o /var/www/lib/aws.phar https://github.com/aws/aws-sdk-php/releases/download/3.0.0/aws.phar
