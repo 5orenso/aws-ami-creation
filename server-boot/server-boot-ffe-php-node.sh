@@ -129,6 +129,14 @@ aws s3 cp s3://ffe-static-web/php/aws.phar /var/www/lib/aws.phar --region eu-wes
 aws s3 cp s3://ffe-static-web/php/PHPExcel_1.8.0.zip /var/www/lib/PHPExcel_1.8.0.zip --region eu-west-1
 unzip /var/www/lib/PHPExcel_1.8.0.zip -d /var/www/lib/
 ln -s /var/www/lib/Classes /var/www/lib/PHPExcel
+aws s3 cp s3://ffe-static-web/php/aws-autoloader.php /var/www/lib/aws-autoloader.php --region eu-west-1
+mkdir  /var/www/lib/Aws/
+aws s3 sync s3://ffe-static-web/php/Aws/ /var/www/lib/Aws/ --region eu-west-1
+mkdir /var/www/lib/Guzzle/
+aws s3 sync s3://ffe-static-web/php/Guzzle/ /var/www/lib/Guzzle/ --region eu-west-1
+mkdir /var/www/lib/Symfony/
+aws s3 sync s3://ffe-static-web/php/Symfony/ /var/www/lib/Symfony/ --region eu-west-1
+
 
 mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.ini.old
 ln -s /srv/config/ffe/php5/apache2/php.ini /etc/php5/apache2/php.ini
