@@ -50,6 +50,10 @@ case $key in
     AWS_PROFILE="$2"
     shift # past argument
     ;;
+    -b|--load-balancer-name)
+    LOAD_BALANCER_NAME="$2"
+    shift # past argument
+    ;;
     *)
     # unknown option
     ;;
@@ -70,6 +74,7 @@ if [ ! -z "$HELP" ]; then
     echo "     -s|--subnet-list <comma separated list of subnets>"
     echo "    [-r|--aws-region <awd region>]"
     echo "    [-p|--aws-profile <aws profile>]"
+    echo "    [-b|--load-balancer-name <load balancer name>]"
     echo ""
     echo "bash ${0}"
     echo "    -l <name of launch config>"
@@ -90,6 +95,10 @@ HEALTH_CHECK_GRACE_PERIODE=${HEALTH_CHECK_GRACE_PERIODE:-60}
 # Optional value
 if [ ! -z "$AWS_PROFILE" ]; then
     AWS_PROFILE="--profile ${AWS_PROFILE}"
+fi
+
+if [ ! -z "$LOAD_BALANCER_NAME" ]; then
+    LOAD_BALANCER_NAME="--load-balancer-names ${LOAD_BALANCER_NAME}"
 fi
 
 # Required values
@@ -137,11 +146,13 @@ echo "SIZE_MAX                   : ${SIZE_MAX}"
 echo "SIZE_DESIRED               : ${SIZE_DESIRED}"
 echo "COOLDOWN                   : ${COOLDOWN}"
 echo "HEALTH_CHECK_GRACE_PERIODE : ${HEALTH_CHECK_GRACE_PERIODE}"
+echo "LOAD_BALANCER_NAME         : ${LOAD_BALANCER_NAME}"
 echo ""
 echo "Running aws autoscaling create-auto-scaling-group:"
 echo "--------------------------------------------------"
 
 AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
+    --region $AWS_REGION \
     --auto-scaling-group-name $AUTO_SCALING_GROUP_NAME \
     --launch-configuration-name $LAUNCH_CONFIG_NAME \
     --min-size $SIZE_MIN \
@@ -149,6 +160,7 @@ AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
     --desired-capacity $SIZE_DESIRED \
     --default-cooldown $COOLDOWN \
     --vpc-zone-identifier $SUBNET_LIST \
+    $LOAD_BALANCER_NAME \
     --termination-policies "OldestInstance" \
     --health-check-grace-period $HEALTH_CHECK_GRACE_PERIODE \
     --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME})

@@ -208,6 +208,7 @@ echo "Running aws autoscaling create-launch-configuration:"
 echo "----------------------------------------------------"
 
 LC_RUN_OUTPUT=$(aws autoscaling create-launch-configuration $AWS_PROFILE \
+    --region $AWS_REGION \
     --launch-configuration-name $LAUNCH_CONFIG_NAME \
     --key-name $KEY_PAIR \
     --image-id $INSTANCE_ID \
