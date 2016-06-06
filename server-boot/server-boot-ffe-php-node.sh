@@ -4,7 +4,6 @@ export LC_ALL=en_US.UTF-8
 
 # ----------------------------------------------------------------
 # Get the applications and configs you want to run on this server:
-mkdir /srv/
 cd /srv/
 git clone $GIT_REPO_CONFIG
 git clone $GIT_REPO_ZU_CMS
@@ -28,7 +27,6 @@ ln -s /srv/config/ffe/Zu-CMS/zu/config.js /srv/Zu-CMS/config/config.js
 
 # --> FFE-CMS
 # PHP
-mkdir /var/www/
 chown www-data.www-data /var/www/
 chmod 755 /var/www/
 chmod g+s /var/www/
@@ -86,7 +84,6 @@ ln -s /var/www/www.flyfisheurope.com/jafw /var/www/dealer.flyfisheurope.com/.
 ln -s /var/www/www.flyfisheurope.com/jquery-file-upload /var/www/dealer.flyfisheurope.com/.
 ln -s /var/www/www.flyfisheurope.com/sizechart /var/www/dealer.flyfisheurope.com/.
 ln -s /var/www/www.flyfisheurope.com/test /var/www/dealer.flyfisheurope.com/.
-ln -s /var/www/www.flyfisheurope.com/index.html /var/www/dealer.flyfisheurope.com/.
 ln -s /var/www/www.flyfisheurope.com/index_dealer.html /var/www/dealer.flyfisheurope.com/index.html
 ln -s /var/www/www.flyfisheurope.com/favicon.ico /var/www/dealer.flyfisheurope.com/.
 ln -s /var/www/www.flyfisheurope.com/img.php /var/www/dealer.flyfisheurope.com/.
@@ -108,12 +105,14 @@ chown www-data.www-data /var/log/FFE-CMS/
 chown www-data.www-data /var/run/FFE-CMS/
 
 # Install PHP stuff
-curl -o /var/www/lib/v1.18.1.tar.gz https://github.com/twigphp/Twig/archive/v1.18.1.tar.gz
-tar -zxvf /var/www/lib/v1.18.1.tar.gz -C /var/www/lib/
-ln -s /var/www/lib/Twig-1.18.1 /var/www/lib/Twig
-curl -o /var/www/lib/aws.phar https://github.com/aws/aws-sdk-php/releases/download/3.0.0/aws.phar
+# curl -o /var/www/lib/v1.24.1.tar.gz https://codeload.github.com/twigphp/Twig/tar.gz/v1.24.1
+aws s3 cp s3://ffe-static-web/php/v1.24.1.tar.gz /var/www/lib/v1.24.1.tar.gz
+tar -zxvf /var/www/lib/v1.24.1.tar.gz -C /var/www/lib/
+ln -s /var/www/lib/Twig-1.24.1 /var/www/lib/Twig
+# curl -o /var/www/lib/aws.phar https://github.com/aws/aws-sdk-php/releases/download/3.0.0/aws.phar
+aws s3 cp s3://ffe-static-web/php/aws.phar /var/www/lib/aws.phar --region eu-west-1
 # wget https://s3-eu-west-1.amazonaws.com/ffe-static-web/php/PHPExcel_1.8.0.zip -O /var/www/lib/PHPExcel_1.8.0.zip
-aws s3 cp s3://ffe-static-web/php/PHPExcel_1.8.0.zip /var/www/lib/PHPExcel_1.8.0.zip
+aws s3 cp s3://ffe-static-web/php/PHPExcel_1.8.0.zip /var/www/lib/PHPExcel_1.8.0.zip --region eu-west-1
 unzip /var/www/lib/PHPExcel_1.8.0.zip -d /var/www/lib/
 ln -s /var/www/lib/Classes /var/www/lib/PHPExcel
 
