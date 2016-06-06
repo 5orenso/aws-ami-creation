@@ -152,6 +152,7 @@ echo "Running aws autoscaling create-auto-scaling-group:"
 echo "--------------------------------------------------"
 
 AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
+    --region $AWS_REGION \
     --auto-scaling-group-name $AUTO_SCALING_GROUP_NAME \
     --launch-configuration-name $LAUNCH_CONFIG_NAME \
     --min-size $SIZE_MIN \
