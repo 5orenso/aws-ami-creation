@@ -10,19 +10,25 @@ git clone $GIT_REPO_ZU_CMS
 
 # --> Zu-CMS
 # Install all Node.js packages
-cd /srv/Zu-CMS/
+ln -s /srv/Zu-CMS /srv/zu
+cd /srv/zu/
 npm install --production
-
-# Install the application:
-chown www-data:www-data /srv/Zu-CMS/
-chmod 755 /srv/Zu-CMS/
-
-# Log folder
-mkdir /srv/Zu-CMS/logs/
-chown www-data:www-data /srv/Zu-CMS/logs/
 
 # Config file
 ln -s /srv/config/ffe/Zu-CMS/zu/config.js /srv/Zu-CMS/config/config.js
+cp /srv/config/ffe/etc/init/zu.conf /etc/init/zu.conf
+
+# Log folder
+mkdir /srv/Zu-CMS/logs/
+mkdir /var/log/Zu-CMS/
+mkdir /var/log/zu/
+mkdir /var/run/zu/
+chown www-data.www-data /var/log/Zu-CMS/ /var/run/zu/ /var/log/zu/ /srv/Zu-CMS/logs/
+
+chown www-data:www-data /srv/Zu-CMS/
+chmod 755 /srv/Zu-CMS/
+
+service zu start
 
 
 # --> FFE-CMS
@@ -190,7 +196,7 @@ MAILTO=sorenso@gmail.com
 30 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 40 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 50 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-10 2 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 2 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               s3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 20 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 30 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/favicon.ico         s3://ffe-static-web/favicon.ico --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 40 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/img.php             s3://ffe-static-web/img.php --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
