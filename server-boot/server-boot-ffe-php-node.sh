@@ -82,6 +82,16 @@ mkdir /var/www/www.flyfisheurope.com/test/
 # dev.zu.no
 git clone $GIT_REPO_FFE_CMS /var/www/dev.zu.no/zu/
 ln -s /var/www/www.flyfisheurope.com/images /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/fancyBox /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/img /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/jafw /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/jquery-file-upload /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/sizechart /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/test /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/index_dealer.html /var/www/dev.zu.no/index.html
+ln -s /var/www/www.flyfisheurope.com/favicon.ico /var/www/dev.zu.no/.
+ln -s /var/www/www.flyfisheurope.com/img.php /var/www/dev.zu.no/.
+
 ln -s /srv/config/ffe/FFE-CMS/dev.zu.no/main.ini /var/www/dev.zu.no/zu/config/main.ini
 ln -s /var/www/dev.zu.no/zu/view/consumer_web/css /var/www/dev.zu.no/css
 ln -s /var/www/dev.zu.no/zu/view/consumer_web/js /var/www/dev.zu.no/js
