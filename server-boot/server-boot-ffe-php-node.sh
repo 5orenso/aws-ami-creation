@@ -183,6 +183,9 @@ ln -s /srv/config/ffe/etc/logrotate.d/syslog /etc/logrotate.d/.
 # Fix postfix config. Sending email via sendgrid.
 mv /etc/postfix/main.cf /etc/postfix/main.cf.old
 ln -s /srv/config/ffe/etc/postfix/main.cf /etc/postfix/main.cf
+ln -s /srv/config/ffe/etc/postfix/generic /etc/postfix/generic
+postmap /etc/postfix/generic
+
 service postfix restart
 
 # Logs to AWS Cloudwatch
