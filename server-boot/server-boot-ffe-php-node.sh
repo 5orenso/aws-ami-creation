@@ -179,6 +179,8 @@ ln -s /srv/config/ffe/etc/logrotate.d/fail2ban /etc/logrotate.d/.
 ln -s /srv/config/ffe/etc/logrotate.d/zu /etc/logrotate.d/.
 ln -s /srv/config/ffe/etc/logrotate.d/mail /etc/logrotate.d/.
 ln -s /srv/config/ffe/etc/logrotate.d/syslog /etc/logrotate.d/.
+rm /etc/logrotate.d/rsyslog
+ln -s /srv/config/ffe/etc/logrotate.d/rsyslog /etc/logrotate.d/.
 
 # Fix postfix config. Sending email via sendgrid.
 mv /etc/postfix/main.cf /etc/postfix/main.cf.old
