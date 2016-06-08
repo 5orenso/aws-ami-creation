@@ -221,16 +221,21 @@ service varnish restart
 # Cron - from the repo
 read -r -d '' CRONTAB_LINES <<- EOM
 MAILTO=sorenso@gmail.com
-0 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/images/             s3://ffe-static-web/images/ --exclude "cache/*" --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-10 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/fancyBox/           s3://ffe-static-web/fancyBox/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-20 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/img/                s3://ffe-static-web/img/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-30 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-40 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-50 1 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-10 2 * * * /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               s3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-20 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-30 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/favicon.ico         s3://ffe-static-web/favicon.ico --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-40 2 * * * /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/img.php             s3://ffe-static-web/img.php --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+
+# Copy file to AWS S3
+0  * * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/images/             s3://ffe-static-web/images/ --exclude "cache/*" --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/fancyBox/           s3://ffe-static-web/fancyBox/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+20 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/img/                s3://ffe-static-web/img/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+30 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+40 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+50 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 2 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               s3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+20 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+30 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/favicon.ico         s3://ffe-static-web/favicon.ico --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+40 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/img.php             s3://ffe-static-web/img.php --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+
+# Copy files from AWS S3
+30 * * * *  /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync-down.log
 
 EOM
 
