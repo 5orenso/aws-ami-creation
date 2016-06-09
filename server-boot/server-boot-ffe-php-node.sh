@@ -118,6 +118,8 @@ ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/js /var/www/dealer.
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/posters /var/www/dealer.flyfisheurope.com/posters
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/img /var/www/dealer.flyfisheurope.com/imgs
 ln -s /var/www/dealer.flyfisheurope.com/zu/qrcodes /var/www/dealer.flyfisheurope.com/qrcodes
+mkdir /var/www/dealer.flyfisheurope.com/visma
+mkdir /var/www/dealer.flyfisheurope.com/zu/cli/log/
 
 # Chown
 chown -R www-data.www-data /var/www/
@@ -240,3 +242,28 @@ MAILTO=sorenso@gmail.com
 EOM
 
 (crontab -l; echo "$CRONTAB_LINES" ) | crontab -u ubuntu -
+
+
+# Cron - from the repo
+read -r -d '' CRONTAB_LINES <<- EOM
+MAILTO=sorenso@gmail.com
+
+# Update date and time
+0 3 * * *  /usr/sbin/ntpdate time-b.nist.gov
+
+# Transfer all completed orders.
+*/1 * * * * /bin/bash /var/www/dealer.flyfisheurope.com/zu/cli/transfer_orders.sh >> /var/www/dealer.flyfisheurope.com/zu/cli/log/transfer_orders.sh.log 2>&1
+
+# Download and parse all XML files.
+2,7,12,17,22,27,32,37,42,47,52,57 * * * * /bin/bash /var/www/dealer.flyfisheurope.com/zu/cli/download_xml_files.sh >> /var/www/dealer.flyfisheurope.com/zu/cli/log/download_xml_files.`/bin/date +\%Y\%m\%d`.log 2>&1
+
+# Cleaning up files
+55 5 * * * /usr/bin/find /srv/zu/example/ -name '*.xml' -mtime +1 | /usr/bin/xargs /bin/gzip -9
+58 5 * * * /usr/bin/find /srv/zu/example/ -name '*.csv' -mtime +1 | /usr/bin/xargs /bin/gzip -9
+55 6 * * * /usr/bin/find /var/backups/mongodb/ -type f | /bin/grep -v '.gz' | /usr/bin/xargs /bin/gzip -9
+55 5 * * * /usr/bin/find /var/www/dealer.flyfisheurope.com/zu/cli/log/ -name '*.log' -mtime +5 | /usr/bin/xargs /bin/gzip -9
+55 5 * * * /usr/bin/find /var/www/dealer.flyfisheurope.com/zu/cli/log/ -name '*.json' -mtime +5 | /usr/bin/xargs /bin/gzip -9
+
+EOM
+
+(crontab -l; echo "$CRONTAB_LINES" ) | crontab -u root -
