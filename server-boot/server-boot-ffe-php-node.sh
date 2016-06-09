@@ -38,17 +38,14 @@ chmod 755 /srv/Zu-CMS/
 
 service zu start
 
-
 # --> FFE-CMS
 # PHP
 chown www-data.www-data /var/www/
 chmod 755 /var/www/
 chmod g+s /var/www/
 
-mkdir /var/www/lib/
-
-
 # www.flyfisheurope.com
+# git clone creates the target folder with mkdir -p
 git clone $GIT_REPO_FFE_CMS /var/www/www.flyfisheurope.com/zu/
 mkdir -p /var/www/www.flyfisheurope.com/images/cache/
 ln -s /srv/config/ffe/FFE-CMS/www.flyfisheurope.com/main.ini /var/www/www.flyfisheurope.com/zu/config/main.ini
@@ -78,8 +75,8 @@ mkdir /var/www/www.flyfisheurope.com/test/
 /usr/bin/aws s3 cp s3://ffe-static-web/favicon.ico /var/www/www.flyfisheurope.com/favicon.ico --region eu-west-1
 /usr/bin/aws s3 cp s3://ffe-static-web/img.php /var/www/www.flyfisheurope.com/img.php --region eu-west-1
 
-
 # dev.zu.no
+# git clone creates the target folder with mkdir -p
 git clone $GIT_REPO_FFE_CMS /var/www/dev.zu.no/zu/
 ln -s /var/www/www.flyfisheurope.com/images /var/www/dev.zu.no/.
 ln -s /var/www/www.flyfisheurope.com/fancyBox /var/www/dev.zu.no/.
@@ -100,6 +97,7 @@ ln -s /var/www/dev.zu.no/zu/view/consumer_web/img /var/www/dev.zu.no/imgs
 ln -s /var/www/dev.zu.no/zu/qrcodes /var/www/dev.zu.no/qrcodes
 
 # dealer.flyfisheurope.com
+# git clone creates the target folder with mkdir -p
 git clone $GIT_REPO_FFE_CMS /var/www/dealer.flyfisheurope.com/zu/
 ln -s /var/www/www.flyfisheurope.com/images /var/www/dealer.flyfisheurope.com/.
 ln -s /var/www/www.flyfisheurope.com/fancyBox /var/www/dealer.flyfisheurope.com/.
@@ -129,26 +127,6 @@ mkdir /var/run/FFE-CMS
 
 chown www-data.www-data /var/log/FFE-CMS/
 chown www-data.www-data /var/run/FFE-CMS/
-
-# Install PHP stuff
-# curl -o /var/www/lib/v1.24.1.tar.gz https://codeload.github.com/twigphp/Twig/tar.gz/v1.24.1
-aws s3 cp s3://ffe-static-web/php/v1.24.1.tar.gz /var/www/lib/v1.24.1.tar.gz --region eu-west-1
-tar -zxvf /var/www/lib/v1.24.1.tar.gz -C /var/www/lib/
-ln -s /var/www/lib/Twig-1.24.1 /var/www/lib/Twig
-# curl -o /var/www/lib/aws.phar https://github.com/aws/aws-sdk-php/releases/download/3.0.0/aws.phar
-aws s3 cp s3://ffe-static-web/php/aws.phar /var/www/lib/aws.phar --region eu-west-1
-# wget https://s3-eu-west-1.amazonaws.com/ffe-static-web/php/PHPExcel_1.8.0.zip -O /var/www/lib/PHPExcel_1.8.0.zip
-aws s3 cp s3://ffe-static-web/php/PHPExcel_1.8.0.zip /var/www/lib/PHPExcel_1.8.0.zip --region eu-west-1
-unzip /var/www/lib/PHPExcel_1.8.0.zip -d /var/www/lib/
-ln -s /var/www/lib/Classes /var/www/lib/PHPExcel
-aws s3 cp s3://ffe-static-web/php/aws-autoloader.php /var/www/lib/aws-autoloader.php --region eu-west-1
-mkdir  /var/www/lib/Aws/
-aws s3 sync s3://ffe-static-web/php/Aws/ /var/www/lib/Aws/ --region eu-west-1
-mkdir /var/www/lib/Guzzle/
-aws s3 sync s3://ffe-static-web/php/Guzzle/ /var/www/lib/Guzzle/ --region eu-west-1
-mkdir /var/www/lib/Symfony/
-aws s3 sync s3://ffe-static-web/php/Symfony/ /var/www/lib/Symfony/ --region eu-west-1
-
 
 mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.ini.old
 ln -s /srv/config/ffe/php5/apache2/php.ini /etc/php5/apache2/php.ini
@@ -215,7 +193,6 @@ log_group_name = api/request.log
 EOF
 service awslogs restart
 
-
 # Run the applications:
 service apache2 restart
 service varnish restart
@@ -225,7 +202,7 @@ read -r -d '' CRONTAB_LINES <<- EOM
 MAILTO=sorenso@gmail.com
 
 # Copy file to AWS S3
-0  * * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/images/             s3://ffe-static-web/images/ --exclude "cache/*" --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+0  * * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/images/             s3://ffe-static-web/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 10 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/fancyBox/           s3://ffe-static-web/fancyBox/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 20 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/img/                s3://ffe-static-web/img/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 30 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log

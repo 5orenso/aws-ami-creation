@@ -69,6 +69,27 @@ sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
 mkdir -p /var/www/www.flyfisheurope.com/images/cache/
 /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1
 
+# Install PHP stuff
+# Make directory
+mkdir /var/www/lib/
+# Copy and unzip files.
+aws s3 cp s3://ffe-static-web/php/v1.24.1.tar.gz /var/www/lib/v1.24.1.tar.gz --region eu-west-1
+tar -zxvf /var/www/lib/v1.24.1.tar.gz -C /var/www/lib/
+ln -s /var/www/lib/Twig-1.24.1 /var/www/lib/Twig
+aws s3 cp s3://ffe-static-web/php/aws.phar /var/www/lib/aws.phar --region eu-west-1
+aws s3 cp s3://ffe-static-web/php/PHPExcel_1.8.0.zip /var/www/lib/PHPExcel_1.8.0.zip --region eu-west-1
+unzip /var/www/lib/PHPExcel_1.8.0.zip -d /var/www/lib/
+ln -s /var/www/lib/Classes /var/www/lib/PHPExcel
+aws s3 cp s3://ffe-static-web/php/aws-autoloader.php /var/www/lib/aws-autoloader.php --region eu-west-1
+mkdir  /var/www/lib/Aws/
+aws s3 sync s3://ffe-static-web/php/Aws/ /var/www/lib/Aws/ --region eu-west-1
+mkdir /var/www/lib/Guzzle/
+aws s3 sync s3://ffe-static-web/php/Guzzle/ /var/www/lib/Guzzle/ --region eu-west-1
+mkdir /var/www/lib/Symfony/
+aws s3 sync s3://ffe-static-web/php/Symfony/ /var/www/lib/Symfony/ --region eu-west-1
+# Change owner
+chown -R www-data.www-data /var/www/
+
 # Datadog
 #DD_API_KEY=xxxxxyyyyzzzzz bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
 
