@@ -245,7 +245,7 @@ EOM
 
 
 # Cron - from the repo
-read -r -d '' CRONTAB_LINES <<- EOM
+read -r -d '' ROOT_CRONTAB_LINES <<- EOM
 MAILTO=sorenso@gmail.com
 
 # Update date and time
@@ -266,4 +266,4 @@ MAILTO=sorenso@gmail.com
 
 EOM
 
-(crontab -l; echo "$CRONTAB_LINES" ) | crontab -u root -
+(crontab -l; echo "$ROOT_CRONTAB_LINES" ) | crontab -u root -
