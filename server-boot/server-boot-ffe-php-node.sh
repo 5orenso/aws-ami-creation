@@ -198,30 +198,6 @@ service apache2 restart
 service varnish restart
 
 # Cron - from the repo
-read -r -d '' CRONTAB_LINES <<- EOM
-MAILTO=sorenso@gmail.com
-
-# Copy file to AWS S3
-0  * * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/images/             s3://ffe-static-web/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-10 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/fancyBox/           s3://ffe-static-web/fancyBox/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-20 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/img/                s3://ffe-static-web/img/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-30 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-40 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-50 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-10 2 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               s3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-20 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-30 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/favicon.ico         s3://ffe-static-web/favicon.ico --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-40 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/img.php             s3://ffe-static-web/img.php --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-
-# Copy files from AWS S3
-30 * * * *  /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync-down.log
-
-EOM
-
-(crontab -l; echo "$CRONTAB_LINES" ) | crontab -u ubuntu -
-
-
-# Cron - from the repo
 read -r -d '' ROOT_CRONTAB_LINES <<- EOM
 MAILTO=sorenso@gmail.com
 
@@ -241,6 +217,24 @@ MAILTO=sorenso@gmail.com
 55 5 * * * /usr/bin/find /var/www/dealer.flyfisheurope.com/zu/cli/log/ -name '*.log' -mtime +5 | /usr/bin/xargs /bin/gzip -9
 55 5 * * * /usr/bin/find /var/www/dealer.flyfisheurope.com/zu/cli/log/ -name '*.json' -mtime +5 | /usr/bin/xargs /bin/gzip -9
 
+# Copy file to AWS S3
+0  * * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/images/             s3://ffe-static-web/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/fancyBox/           s3://ffe-static-web/fancyBox/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+20 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/img/                s3://ffe-static-web/img/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+30 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+40 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+50 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 2 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               s3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+20 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+30 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/favicon.ico         s3://ffe-static-web/favicon.ico --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+40 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/img.php             s3://ffe-static-web/img.php --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+
+# Copy files from AWS S3
+30 * * * *  /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync-down.log
+35 * * * * /bin/chown -R www-data.www-data /var/www/www.flyfisheurope.com/images/ >> /home/ubuntu/aws-chown-images.log
+
 EOM
 
 (crontab -l; echo "$ROOT_CRONTAB_LINES" ) | crontab -u root -
+
+# done
