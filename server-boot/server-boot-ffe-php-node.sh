@@ -213,7 +213,6 @@ MAILTO=sorenso@gmail.com
 # Cleaning up files
 55 5 * * * /usr/bin/find /srv/zu/example/ -name '*.xml' -mtime +1 | /usr/bin/xargs /bin/gzip -9
 58 5 * * * /usr/bin/find /srv/zu/example/ -name '*.csv' -mtime +1 | /usr/bin/xargs /bin/gzip -9
-55 6 * * * /usr/bin/find /var/backups/mongodb/ -type f | /bin/grep -v '.gz' | /usr/bin/xargs /bin/gzip -9
 55 5 * * * /usr/bin/find /var/www/dealer.flyfisheurope.com/zu/cli/log/ -name '*.log' -mtime +5 | /usr/bin/xargs /bin/gzip -9
 55 5 * * * /usr/bin/find /var/www/dealer.flyfisheurope.com/zu/cli/log/ -name '*.json' -mtime +5 | /usr/bin/xargs /bin/gzip -9
 
