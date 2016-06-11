@@ -245,4 +245,27 @@ EOM
 
 (crontab -l; echo "$ROOT_CRONTAB_LINES" ) | crontab -u root -
 
+mail_body=$(cat <<EOM
+Hey,
+<p>
+New server is online!
+<p>
+Hostname: $(hostname).<br>
+Instance ID: $(curl http://169.254.169.254/latest/meta-data/instance-id).<br>
+Current date is: $(date).<br>
+<p>
+Filesystem:<br>
+<xmp>$(df -h)</xmp>
+<p>
+w:<br>
+<xmp>$(w)</xmp>
+<p>
+Regards,<br>
+aws-ami-creation<br>
+https://github.com/5orenso/aws-ami-creation/<br>
+
+EOM
+)
+echo "$mail_body" | mail sorenso@gmail.com -s 'Hey! New server is online :)' -a 'Content-type: text/html;'
+
 # done
