@@ -67,7 +67,7 @@ mkdir /var/www/www.flyfisheurope.com/test/
 /usr/bin/aws s3 sync s3://ffe-static-web/fancyBox/ /var/www/www.flyfisheurope.com/fancyBox/ --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/img/ /var/www/www.flyfisheurope.com/img/ --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/jafw/ /var/www/www.flyfisheurope.com/jafw/ --region eu-west-1
-/usr/bin/aws s3 sync s3://ffe-static-web/jquery-file-upload/ /var/www/www.flyfisheurope.com/jquery-file-upload/ --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/jquery-file-upload/ /var/www/www.flyfisheurope.com/jquery-file-upload/ --exclude "server/php/files/*" --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/sizechart/ /var/www/www.flyfisheurope.com/sizechart/ --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/test/ /var/www/www.flyfisheurope.com/test/ --region eu-west-1
 /usr/bin/aws s3 cp s3://ffe-static-web/index.html /var/www/www.flyfisheurope.com/index.html --region eu-west-1
