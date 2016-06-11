@@ -71,7 +71,12 @@ _If you have brew you can install jq this way:_
 ```bash
 $ brew install jq
 ```
- 
+
+_If you have Node.js and npm:_
+```
+$bash npm install -g msee
+```
+
 __Get started with an AWS Account:__
 * [Setup an Amazon Web Services account](https://aws.amazon.com/)
 * [Install the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
