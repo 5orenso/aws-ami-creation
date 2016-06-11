@@ -1,5 +1,46 @@
 #!/usr/bin/env bash
 
+# -- Color
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 124)
+GREEN=$(tput setaf 40)
+YELLOW=$(tput setaf 136)
+BLUE=$(tput setaf 69)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 37)
+ORANGE=$(tput setaf 208)
+PURPLE=$(tput setaf 92)
+WHITE=$(tput setaf 15)
+DARK_GRAY=$(tput setaf 240)
+
+# -- Text mode
+BOLD=$(tput bold)
+ITALIC=$(tput sitm)
+DIM=$(tput dim)
+SMUL=$(tput smul)
+RMUL=$(tput rmul)
+REV=$(tput rev)
+SMSO=$(tput smso)
+RMSO=$(tput rmso)
+# -- Reset
+R=$(tput sgr0)
+
+# -- Styling
+ERROR_BULLET="${RED}>>${R}"
+MISSING_KEYWORD="${ORANGE}${ITALIC}"
+OPT="${BOLD}"
+PH="${DARK_GRAY}"
+BASH="${DARK_GRAY}"
+SCRIPT="${BLUE}"
+
+function printOutput() {
+    if hash msee 2>/dev/null; then
+        echo "$1" | msee
+    else
+        echo "$1"
+    fi
+}
+
 # Read command line input:
 while [[ $# > 1 ]]
 do
@@ -7,67 +48,81 @@ key="$1"
 
 case $key in
     -h|--help)
-    HELP="$2"
-    shift # past argument
+        HELP="$2"
+        shift # past argument
     ;;
     -b|--base-image)
-    BASE_IMAGE="$2"
-    shift # past argument
+        BASE_IMAGE="$2"
+        shift # past argument
     ;;
     -i|--iam-profile)
-    IAM_PROFILE="$2"
-    shift # past argument
+        IAM_PROFILE="$2"
+        shift # past argument
     ;;
     -k|--key-pair)
-    KEY_PAIR="$2"
-    shift # past argument
+        KEY_PAIR="$2"
+        shift # past argument
     ;;
     -s|--subnet)
-    SUBNET="$2"
-    shift # past argument
+        SUBNET="$2"
+        shift # past argument
     ;;
     -t|--instance-type)
-    INSTANCE_TYPE="$2"
-    shift # past argument
+        INSTANCE_TYPE="$2"
+        shift # past argument
     ;;
     -g|--security-group)
-    SECURITY_GROUP="$2"
-    shift # past argument
+        SECURITY_GROUP="$2"
+        shift # past argument
     ;;
     -u|--user-data-file)
-    USER_DATA_FILE="$2"
-    shift # past argument
+        USER_DATA_FILE="$2"
+        shift # past argument
     ;;
     -r|--aws-region)
-    AWS_REGION="$2"
-    shift # past argument
+        AWS_REGION="$2"
+        shift # past argument
     ;;
     -p|--aws-profile)
-    AWS_PROFILE="$2"
-    shift # past argument
+        AWS_PROFILE="$2"
+        shift # past argument
     ;;
     *)
-    # unknown option
+        # unknown option
     ;;
 esac
 shift # past argument or value
 done
 
 if [ ! -z "$HELP" ]; then
-    echo "bash ${0} "
-    echo "    [-h|--help 1]"
-    echo "    [-b|--base-image <ami id>]"
-    echo "    [-g|--security-group <id of security group>]"
-    echo "     -i|--iam-profile <iam profile for image creation>"
-    echo "     -k|--key-pair <name of key-pair>"
-    echo "    [-s|--subnet <subnet id>]"
-    echo "    [-t|--instance-type <instance type>]"
-    echo "     -u|--user-data-file <ami template file>"
-    echo "    [-r|--aws-region <awd region>]"
-    echo "    [-p|--aws-profile <aws profile>]"
-    echo ""
-    echo "bash ${0} -i <iam profile> -k <name of key-pair> -u <user data file>"
-    echo ""
+    output=$(cat <<EOM
+# Help!
+This script will generate an AMI based on your input.
+This AMI can be found on your __AMI page__ inside your AWS account when it is done.
+Just follow the instructions inside this file to get started.
+
+# tl;dr
+
+    bash ${0}
+
+# Usage
+
+    bash ${0}
+        [-h|--help 1]
+        [-b|--base-image <ami id>]
+        [-g|--security-group <id of security group>]
+         -i|--iam-profile <iam profile for image creation>
+         -k|--key-pair <name of key-pair>
+        [-s|--subnet <subnet id>]
+        [-t|--instance-type <instance type>]
+         -u|--user-data-file <ami template file>
+        [-r|--aws-region <awd region>]
+        [-p|--aws-profile <aws profile>]
+
+    bash ${0} -i <iam profile> -k <name of key-pair> -u <user data file>
+EOM
+)
+    printOutput "$output"
     exit 1;
 fi
 
@@ -92,37 +147,43 @@ fi
 # Required values
 if [ -z "$IAM_PROFILE" ]; then
     EXIT_MISSING=1
-    echo '* Missing "iam profile". Please set with:'
-    echo '    -i|--iam-profile <iam profile>'
-    echo '    Example usage:'
-    echo '        -i role-ami-creator'
-    echo '    Existing roles:'
+    cat <<EOM
+${ERROR_BULLET} Missing "${MISSING_KEYWORD}iam profile${R}". Please set with:
+      ${OPT}-i${R}|${OPT}--iam-profile${R} <${PH}iam profile${R}>
+  Example usage:
+      -i role-ami-creator
+  Existing roles:
+EOM
     aws iam list-roles $AWS_PROFILE | jq -c '.Roles[] | {name: .RoleName}'
-    echo ''
+    echo ""
 fi
 if [ -z "$USER_DATA_FILE" ]; then
     EXIT_MISSING=1
-    echo '* Missing "user data file". Please set with:'
-    echo '    -u|--user-data-file <ami template file>'
-    echo '    Example usage:'
-    echo '        -u ami-templates/ami-template-node-ami.sh'
-    echo '    Existing user data files:'
+    cat <<EOM
+${ERROR_BULLET} Missing "${MISSING_KEYWORD}user data file${R}". Please set with:
+        ${OPT}-u${R}|${OPT}--user-data-file${R} <${PH}ami template file${R}>
+    Example usage:
+        -u ami-templates/ami-template-node-ami.sh
+    Existing user data files:
+EOM
     ls ami-templates/*.sh | cat
-    echo ''
+    echo ""
 fi
 if [ -z "$KEY_PAIR" ]; then
     EXIT_MISSING=1
-    echo '* Missing "key-pair". Please set with:'
-    echo '    -k|--key-pair <name of key-pair>'
-    echo '    Example usage:'
-    echo '        -k my-key-pair'
-    echo '    Existing key-pairs:'
+    cat <<EOM
+${ERROR_BULLET} Missing "${MISSING_KEYWORD}key-pair${R}". Please set with:
+        ${OPT}-k${R}|${OPT}--key-pair${R} <${PH}name of key-pair${R}>
+    Example usage:
+        -k my-key-pair
+    Existing key-pairs:
+EOM
     aws ec2 describe-key-pairs $AWS_PROFILE | jq -c '.KeyPairs[] | { name: .KeyName }'
-    echo ''
+    echo ""
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
     echo ""
-    echo "bash ${0} -i <iam profile> -k <name of key-pair> -u <user data file>"
+    echo "${BASH}bash${R} ${SCRIPT}${0}${R} -i ${IAM_PROFILE:-"<${PH}iam profile${R}>"} -k ${KEY_PAIR:-"<${PH}name of key-pair${R}>"} -u ${USER_DATA_FILE:-"<${PH}user data file${R}>"}"
     exit 1;
 fi
 
@@ -154,14 +215,14 @@ EC2_RUN_OUTPUT=$(aws ec2 run-instances $AWS_PROFILE \
 INSTANCE_ID=$(echo $EC2_RUN_OUTPUT | jq -r '.Instances[0].InstanceId')
 INSTANCE_IP=$(echo $EC2_RUN_OUTPUT | jq -r '.Instances[0].PrivateIpAddress')
 
-echo "INSTANCE_ID       : ${INSTANCE_ID}"
-echo "INSTANCE_IP       : ${INSTANCE_IP}"
+echo "INSTANCE_ID       : ${BLUE}${INSTANCE_ID}${R}"
+echo "INSTANCE_IP       : ${BLUE}${INSTANCE_IP}${R}"
 echo ""
 echo "Now jump to the EC2 console page to find your instance:"
-echo "https://${AWS_REGION}.console.aws.amazon.com/ec2/v2/home?region=${AWS_REGION}#Instances:search=${INSTANCE_ID};sort=desc:launchTime"
+echo "${GREEN}https://${AWS_REGION}.console.aws.amazon.com/ec2/v2/home?region=${AWS_REGION}#Instances:search=${INSTANCE_ID};sort=desc:launchTime${R}"
 echo ""
 echo "Your image should appear in at the top of this list after about 10-15 minutes:"
-echo "https://${AWS_REGION}.console.aws.amazon.com/ec2/v2/home?region=${AWS_REGION}#Images:visibility=owned-by-me;sort=desc:creationDate"
+echo "${GREEN}https://${AWS_REGION}.console.aws.amazon.com/ec2/v2/home?region=${AWS_REGION}#Images:visibility=owned-by-me;sort=desc:creationDate${R}"
 echo ""
 echo "Log into server:"
 echo "$ ssh ubuntu@${INSTANCE_IP}"
