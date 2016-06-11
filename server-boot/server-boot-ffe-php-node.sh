@@ -6,8 +6,10 @@ export LC_ALL=en_US.UTF-8
 INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
 #aws ec2 associate-address --instance-id $INSTANCE_ID --public-ip $ELASTIC_IP --allow-reassociation --region eu-west-1
 CURRENT_INSTANCE_ID=$(/usr/bin/aws ec2 describe-addresses --allocation-ids $ELASTIC_IP_ALLOCATION_ID --region eu-west-1 | jq -r '.Addresses[].InstanceId')
+DOWNLOAD_AND_PARSE_VISMA_FILES=''
 if [[ $CURRENT_INSTANCE_ID == null ]] ; then
     /usr/bin/aws ec2 associate-address --instance-id $INSTANCE_ID --allocation-id $ELASTIC_IP_ALLOCATION_ID --allow-reassociation --region eu-west-1
+    DOWNLOAD_AND_PARSE_VISMA_FILES='2,7,12,17,22,27,32,37,42,47,52,57 * * * * /bin/bash /var/www/dealer.flyfisheurope.com/zu/cli/download_xml_files.sh >> /var/www/dealer.flyfisheurope.com/zu/cli/log/download_xml_files.`/bin/date +\%Y\%m\%d`.log 2>&1'
 fi
 
 # ----------------------------------------------------------------
@@ -212,7 +214,7 @@ MAILTO=sorenso@gmail.com
 */1 * * * * /bin/bash /var/www/dealer.flyfisheurope.com/zu/cli/transfer_orders.sh >> /var/www/dealer.flyfisheurope.com/zu/cli/log/transfer_orders.sh.log 2>&1
 
 # Download and parse all XML files.
-2,7,12,17,22,27,32,37,42,47,52,57 * * * * /bin/bash /var/www/dealer.flyfisheurope.com/zu/cli/download_xml_files.sh >> /var/www/dealer.flyfisheurope.com/zu/cli/log/download_xml_files.`/bin/date +\%Y\%m\%d`.log 2>&1
+${DOWNLOAD_AND_PARSE_VISMA_FILES}
 
 # Cleaning up files
 55 5 * * * /usr/bin/find /srv/zu/example/ -name '*.xml' -mtime +1 | /usr/bin/xargs /bin/gzip -9
