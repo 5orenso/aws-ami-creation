@@ -62,10 +62,6 @@ mkdir /var/www/www.flyfisheurope.com/jquery-file-upload/
 mkdir /var/www/www.flyfisheurope.com/sizechart/
 mkdir /var/www/www.flyfisheurope.com/test/
 
-ln -s /var/www/www.flyfisheurope.com/images /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/files
-ln -s /var/www/www.flyfisheurope.com/zu/jquery-file-upload/index.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/.
-ln -s /var/www/www.flyfisheurope.com/zu/jquery-file-upload/UploadHandler.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/.
-
 # Files from s3
 /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1
 /usr/bin/aws s3 sync s3://ffe-static-web/fancyBox/ /var/www/www.flyfisheurope.com/fancyBox/ --region eu-west-1
@@ -78,6 +74,10 @@ ln -s /var/www/www.flyfisheurope.com/zu/jquery-file-upload/UploadHandler.php /va
 /usr/bin/aws s3 cp s3://ffe-static-web/index_dealer.html /var/www/www.flyfisheurope.com/index_dealer.html --region eu-west-1
 /usr/bin/aws s3 cp s3://ffe-static-web/favicon.ico /var/www/www.flyfisheurope.com/favicon.ico --region eu-west-1
 /usr/bin/aws s3 cp s3://ffe-static-web/img.php /var/www/www.flyfisheurope.com/img.php --region eu-west-1
+
+ln -s /var/www/www.flyfisheurope.com/images /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/files
+ln -s /var/www/www.flyfisheurope.com/zu/jquery-file-upload/index.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/.
+ln -s /var/www/www.flyfisheurope.com/zu/jquery-file-upload/UploadHandler.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/.
 
 # dev.zu.no
 # git clone creates the target folder with mkdir -p
@@ -225,7 +225,7 @@ MAILTO=sorenso@gmail.com
 10 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/fancyBox/           s3://ffe-static-web/fancyBox/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 20 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/img/                s3://ffe-static-web/img/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 30 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jafw/               s3://ffe-static-web/jafw/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
-40 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+40 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --exclude "server/php/files/*" --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 50 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 10 2 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               s3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 20 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
