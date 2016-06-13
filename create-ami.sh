@@ -163,7 +163,7 @@ if [ -z "$USER_DATA_FILE" ]; then
 ${ERROR_BULLET} Missing "${MISSING_KEYWORD}user data file${R}". Please set with:
         ${OPT}-u${R}|${OPT}--user-data-file${R} <${PH}ami template file${R}>
     Example usage:
-        -u ami-templates/ami-template-node-ami.sh
+        -u ami-templates/ami-template-node.sh
     Existing user data files:
 EOM
     ls ami-templates/*.sh | cat
