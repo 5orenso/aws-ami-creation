@@ -44,7 +44,7 @@ chmod u+w /var/run/node-express-boilerplate
 # Startup script
 cat > /etc/init/node-express-boilerplate.conf <<'EOF'
 # ----------------------------------------------------------------------
-# datapiper - instance
+# node-express-boilerplate - instance
 #
 description     "node-express-boilerplate"
 
