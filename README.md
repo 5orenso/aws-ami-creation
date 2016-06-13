@@ -26,13 +26,13 @@ $ bash ./create-ami-creator-role.sh
 
 __To get started creating a basic Ubuntu Node.js AMI, simply type:__
 ```bash
-$ bash ./create-ami.sh -u template-node-ami.sh
+$ bash ./create-ami.sh -u ami-template-node.sh
 ```
 
 __Example:__
 ```bash
 $ bash ./create-ami.sh \
-    -u template-node-ami.sh \
+    -u ami-template-node.sh \
     -k my-key-pair \
     -i role-ami-creator
 ```
