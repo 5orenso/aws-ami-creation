@@ -42,56 +42,54 @@ function printOutput() {
 }
 
 # Read command line input:
-while [[ $# > 1 ]]
-do
-key="$1"
-
-case $key in
-    -h|--help)
-        HELP="$2"
-        shift # past argument
-    ;;
-    -b|--base-image)
-        BASE_IMAGE="$2"
-        shift # past argument
-    ;;
-    -i|--iam-profile)
-        IAM_PROFILE="$2"
-        shift # past argument
-    ;;
-    -k|--key-pair)
-        KEY_PAIR="$2"
-        shift # past argument
-    ;;
-    -s|--subnet)
-        SUBNET="$2"
-        shift # past argument
-    ;;
-    -t|--instance-type)
-        INSTANCE_TYPE="$2"
-        shift # past argument
-    ;;
-    -g|--security-group)
-        SECURITY_GROUP="$2"
-        shift # past argument
-    ;;
-    -u|--user-data-file)
-        USER_DATA_FILE="$2"
-        shift # past argument
-    ;;
-    -r|--aws-region)
-        AWS_REGION="$2"
-        shift # past argument
-    ;;
-    -p|--aws-profile)
-        AWS_PROFILE="$2"
-        shift # past argument
-    ;;
-    *)
-        # unknown option
-    ;;
-esac
-shift # past argument or value
+while [[ $# > 1 ]]; do
+    key="$1"
+    case $key in
+        -h|--help)
+            HELP="$2"
+            shift # past argument
+        ;;
+        -b|--base-image)
+            BASE_IMAGE="$2"
+            shift # past argument
+        ;;
+        -i|--iam-profile)
+            IAM_PROFILE="$2"
+            shift # past argument
+        ;;
+        -k|--key-pair)
+            KEY_PAIR="$2"
+            shift # past argument
+        ;;
+        -s|--subnet)
+            SUBNET="$2"
+            shift # past argument
+        ;;
+        -t|--instance-type)
+            INSTANCE_TYPE="$2"
+            shift # past argument
+        ;;
+        -g|--security-group)
+            SECURITY_GROUP="$2"
+            shift # past argument
+        ;;
+        -u|--user-data-file)
+            USER_DATA_FILE="$2"
+            shift # past argument
+        ;;
+        -r|--aws-region)
+            AWS_REGION="$2"
+            shift # past argument
+        ;;
+        -p|--aws-profile)
+            AWS_PROFILE="$2"
+            shift # past argument
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+    shift # past argument or value
 done
 
 if [ ! -z "$HELP" ]; then
@@ -145,6 +143,18 @@ if [ ! -z "$AWS_PROFILE" ]; then
 fi
 
 # Required values
+if [ -z "$KEY_PAIR" ]; then
+    EXIT_MISSING=1
+    cat <<EOM
+${ERROR_BULLET} Missing "${MISSING_KEYWORD}key-pair${R}". Please set with:
+        ${OPT}-k${R}|${OPT}--key-pair${R} <${PH}name of key-pair${R}>
+    Example usage:
+        -k my-key-pair
+    Existing key-pairs:
+EOM
+    aws ec2 describe-key-pairs $AWS_PROFILE | jq -c '.KeyPairs[] | { name: .KeyName }'
+    echo ""
+fi
 if [ -z "$IAM_PROFILE" ]; then
     EXIT_MISSING=1
     cat <<EOM
@@ -167,18 +177,6 @@ ${ERROR_BULLET} Missing "${MISSING_KEYWORD}user data file${R}". Please set with:
     Existing user data files:
 EOM
     ls ami-templates/*.sh | cat
-    echo ""
-fi
-if [ -z "$KEY_PAIR" ]; then
-    EXIT_MISSING=1
-    cat <<EOM
-${ERROR_BULLET} Missing "${MISSING_KEYWORD}key-pair${R}". Please set with:
-        ${OPT}-k${R}|${OPT}--key-pair${R} <${PH}name of key-pair${R}>
-    Example usage:
-        -k my-key-pair
-    Existing key-pairs:
-EOM
-    aws ec2 describe-key-pairs $AWS_PROFILE | jq -c '.KeyPairs[] | { name: .KeyName }'
     echo ""
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
