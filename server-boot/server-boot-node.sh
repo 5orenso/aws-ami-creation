@@ -10,7 +10,7 @@ git clone https://github.com/5orenso/node-express-boilerplate.git
 
 # Install all packages
 cd /srv/node-express-boilerplate/
-npm install
+npm install --production
 
 # Install the application:
 chown ubuntu:ubuntu /srv/node-express-boilerplate/
