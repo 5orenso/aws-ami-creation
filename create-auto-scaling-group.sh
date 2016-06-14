@@ -1,5 +1,46 @@
 #!/usr/bin/env bash
 
+# -- Color
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 124)
+GREEN=$(tput setaf 40)
+YELLOW=$(tput setaf 136)
+BLUE=$(tput setaf 69)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 37)
+ORANGE=$(tput setaf 208)
+PURPLE=$(tput setaf 92)
+WHITE=$(tput setaf 15)
+DARK_GRAY=$(tput setaf 240)
+
+# -- Text mode
+BOLD=$(tput bold)
+ITALIC=$(tput sitm)
+DIM=$(tput dim)
+SMUL=$(tput smul)
+RMUL=$(tput rmul)
+REV=$(tput rev)
+SMSO=$(tput smso)
+RMSO=$(tput rmso)
+# -- Reset
+R=$(tput sgr0)
+
+# -- Styling
+ERROR_BULLET="${RED}>>${R}"
+MISSING_KEYWORD="${ORANGE}${ITALIC}"
+OPT="${BOLD}"
+PH="${DARK_GRAY}"
+BASH="${DARK_GRAY}"
+SCRIPT="${BLUE}"
+
+function printOutput() {
+    if hash msee 2>/dev/null; then
+        echo "$1" | msee
+    else
+        echo "$1"
+    fi
+}
+
 # Read command line input:
 while [[ $# > 1 ]]; do
     key="$1"
@@ -161,7 +202,7 @@ AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
     $LOAD_BALANCER_NAME \
     --termination-policies "OldestInstance" \
     --health-check-grace-period $HEALTH_CHECK_GRACE_PERIODE \
-    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=AG-${AUTO_SCALING_GROUP_NAME})
+    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=${AUTO_SCALING_GROUP_NAME})
 
 echo $AG_RUN_OUTPUT
 echo 'Done!'
