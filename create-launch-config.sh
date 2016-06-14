@@ -2,68 +2,66 @@
 
 
 # Read command line input:
-while [[ $# > 1 ]]
-do
-key="$1"
-
-case $key in
-    -h|--help)
-    HELP="$2"
-    shift # past argument
-    ;;
-    -c|--cloudwatch-monitoring)
-    CLOUDWATCH_MONITORING="$2"
-    shift # past argument
-    ;;
-    -e|--ebs-optimized)
-    EBS_OPTIMIZED="$2"
-    shift # past argument
-    ;;
-    -I|--ami-id)
-    INSTANCE_ID="$2"
-    shift # past argument
-    ;;
-    -i|--iam-profile)
-    IAM_PROFILE="$2"
-    shift # past argument
-    ;;
-    -k|--key-pair)
-    KEY_PAIR="$2"
-    shift # past argument
-    ;;
-    -n|--launch-config-name)
-    LAUNCH_CONFIG_NAME="$2"
-    shift # past argument
-    ;;
-    -s|--secret-user-data-file)
-    SECRET_USER_DATA_FILE="$2"
-    shift # past argument
-    ;;
-    -t|--instance-type)
-    INSTANCE_TYPE="$2"
-    shift # past argument
-    ;;
-    -g|--security-group)
-    SECURITY_GROUP="$2"
-    shift # past argument
-    ;;
-    -u|--user-data-file)
-    USER_DATA_FILE="$2"
-    shift # past argument
-    ;;
-    -r|--aws-region)
-    AWS_REGION="$2"
-    shift # past argument
-    ;;
-    -p|--aws-profile)
-    AWS_PROFILE="$2"
-    shift # past argument
-    ;;
-    *)
-    # unknown option
-    ;;
-esac
-shift # past argument or value
+while [[ $# > 1 ]]; do
+    key="$1"
+    case $key in
+        -h|--help)
+            HELP="$2"
+            shift # past argument
+        ;;
+        -c|--cloudwatch-monitoring)
+            CLOUDWATCH_MONITORING="$2"
+            shift # past argument
+        ;;
+        -e|--ebs-optimized)
+            EBS_OPTIMIZED="$2"
+            shift # past argument
+        ;;
+        -I|--ami-id)
+            INSTANCE_ID="$2"
+            shift # past argument
+        ;;
+        -i|--iam-profile)
+            IAM_PROFILE="$2"
+            shift # past argument
+        ;;
+        -k|--key-pair)
+            KEY_PAIR="$2"
+            shift # past argument
+        ;;
+        -n|--launch-config-name)
+            LAUNCH_CONFIG_NAME="$2"
+            shift # past argument
+        ;;
+        -s|--secret-user-data-file)
+            SECRET_USER_DATA_FILE="$2"
+            shift # past argument
+        ;;
+        -t|--instance-type)
+            INSTANCE_TYPE="$2"
+            shift # past argument
+        ;;
+        -g|--security-group)
+            SECURITY_GROUP="$2"
+            shift # past argument
+        ;;
+        -u|--user-data-file)
+            USER_DATA_FILE="$2"
+            shift # past argument
+        ;;
+        -r|--aws-region)
+            AWS_REGION="$2"
+            shift # past argument
+        ;;
+        -p|--aws-profile)
+            AWS_PROFILE="$2"
+            shift # past argument
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+    shift # past argument or value
 done
 
 if [ ! -z "$HELP" ]; then
