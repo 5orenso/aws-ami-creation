@@ -41,6 +41,9 @@ apt-get update
 # AWS tools and other software
 apt-get install jq awscli git bc make g++ nginx openssl --yes
 
+# For letsencrypt:
+apt-get install augeas-lenses dialog libaugeas0 libexpat1-dev libffi-dev libpython-dev libpython2.7-dev libssl-dev python-dev python-virtualenv python2.7-dev zlib1g-dev --yes
+
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
 
