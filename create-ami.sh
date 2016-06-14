@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# On your Mac: brew install coreutils
+function gnudate() {
+    if hash gdate 2>/dev/null; then
+        gdate "$@"
+    else
+        date "$@"
+    fi
+}
+
 # -- Color
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 124)
@@ -229,4 +238,32 @@ echo "View the cloud-init logfile:"
 echo "$ tail -f /var/log/cloud-init-output.log"
 echo ""
 echo "REMEBER TO SHUTDOWN THE AMI CREATOR SERVER (${INSTANCE_ID}) AFTER AMI IS CREATED! (about 10-15 min)"
+echo ""
+
+# Propose launch config name:
+TODAY=$(gnudate -d "today 13:00 " "+%Y-%m-%d")
+LC_NAME=${USER_DATA_FILE//ami-templates\/ami-template-/}
+LC_BASE_NAME=${LC_NAME//.sh}
+LC_NAME="lc-${LC_BASE_NAME}-${TODAY}"
+if [ ! -z "$AWS_PROFILE" ];then
+    LC_PROFILE="-p ${AWS_PROFILE//--profile /} "
+fi
+if [ ! -z "$KEY_PAIR" ];then
+    LC_KEY_PAIR="-k ${KEY_PAIR} "
+fi
+echo ""
+echo "--------------------------------------------------------------------"
+echo "Next you should run create-launch-config.sh:"
+echo "Usage:"
+echo "    $ bash ./create-launch-config.sh ${LC_PROFILE}${LC_KEY_PAIR}"
+echo "        -I <your new AMI>"
+echo "        -i <server role>"
+echo "        -g <security group>"
+echo "        -t <instance type>"
+echo "        -u launch-configurations/launch-config-${LC_BASE_NAME}.sh"
+echo "        -s launch-configurations/secret-user-data-${LC_BASE_NAME}.sh"
+echo "        -n ${LC_NAME}"
+echo ""
+echo "You can just run this and it will guide you through the rest:"
+echo "    $ bash ./create-launch-config.sh ${LC_PROFILE}${LC_KEY_PAIR}-t t2.micro -u launch-configurations/launch-config-${LC_BASE_NAME}.sh -s launch-configurations/secret-user-data-${LC_BASE_NAME}.sh -n ${LC_NAME}"
 echo ""

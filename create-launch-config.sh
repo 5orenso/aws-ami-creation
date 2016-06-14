@@ -1,5 +1,54 @@
 #!/usr/bin/env bash
 
+# On your Mac: brew install coreutils
+function gnudate() {
+    if hash gdate 2>/dev/null; then
+        gdate "$@"
+    else
+        date "$@"
+    fi
+}
+
+# -- Color
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 124)
+GREEN=$(tput setaf 40)
+YELLOW=$(tput setaf 136)
+BLUE=$(tput setaf 69)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 37)
+ORANGE=$(tput setaf 208)
+PURPLE=$(tput setaf 92)
+WHITE=$(tput setaf 15)
+DARK_GRAY=$(tput setaf 240)
+
+# -- Text mode
+BOLD=$(tput bold)
+ITALIC=$(tput sitm)
+DIM=$(tput dim)
+SMUL=$(tput smul)
+RMUL=$(tput rmul)
+REV=$(tput rev)
+SMSO=$(tput smso)
+RMSO=$(tput rmso)
+# -- Reset
+R=$(tput sgr0)
+
+# -- Styling
+ERROR_BULLET="${RED}>>${R}"
+MISSING_KEYWORD="${ORANGE}${ITALIC}"
+OPT="${BOLD}"
+PH="${DARK_GRAY}"
+BASH="${DARK_GRAY}"
+SCRIPT="${BLUE}"
+
+function printOutput() {
+    if hash msee 2>/dev/null; then
+        echo "$1" | msee
+    else
+        echo "$1"
+    fi
+}
 
 # Read command line input:
 while [[ $# > 1 ]]; do
@@ -111,17 +160,6 @@ CLOUDWATCH_MONITORING=${CLOUDWATCH_MONITORING:-false}
 INSTANCE_TYPE=${INSTANCE_TYPE:-'m3.medium'}
 
 # Required values
-if [ -z "$INSTANCE_ID" ]; then
-    EXIT_MISSING=1
-    echo ''
-    echo '* Missing "ami instance id". Please set with:'
-    echo '    -I|--ami-id <ami id>'
-    echo '    Example usage:'
-    echo '        -I ami-MyNodeAmi'
-    echo '    Existing images:'
-    aws ec2 describe-images --owners self $AWS_PROFILE | jq -c '.Images[] | { id: .ImageId, name: .Name }'
-    echo ''
-fi
 if [ -z "$IAM_PROFILE" ]; then
     EXIT_MISSING=1
     echo ''
@@ -144,13 +182,16 @@ if [ -z "$KEY_PAIR" ]; then
     aws ec2 describe-key-pairs $AWS_PROFILE | jq -c '.KeyPairs[] | { name: .KeyName }'
     echo ''
 fi
-if [ -z "$LAUNCH_CONFIG_NAME" ]; then
+if [ -z "$INSTANCE_ID" ]; then
     EXIT_MISSING=1
     echo ''
-    echo '* Missing "launch-config-name". Please set with:'
-    echo '    -n|--launch-config-name <name of launch config>'
+    echo '* Missing "ami instance id". Please set with:'
+    echo '    -I|--ami-id <ami id>'
     echo '    Example usage:'
-    echo '        -n lc-node-2016-06-01'
+    echo '        -I ami-MyNodeAmi'
+    echo '    Existing images:'
+    aws ec2 describe-images --owners self $AWS_PROFILE | jq -c '.Images[] | { id: .ImageId, name: .Name }'
+    echo ''
 fi
 if [ -z "$SECURITY_GROUP" ]; then
     EXIT_MISSING=1
@@ -173,6 +214,14 @@ if [ -z "$USER_DATA_FILE" ]; then
     echo '    Existing user data files:'
     ls launch-configurations/*.sh | cat
     echo ''
+fi
+if [ -z "$LAUNCH_CONFIG_NAME" ]; then
+    EXIT_MISSING=1
+    echo ''
+    echo '* Missing "launch-config-name". Please set with:'
+    echo '    -n|--launch-config-name <name of launch config>'
+    echo '    Example usage:'
+    echo '        -n lc-node-2016-06-01'
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
     echo ""
@@ -224,4 +273,29 @@ echo 'Done!'
 echo ""
 echo "Now jump to the EC2 console page to find your new Launch Configuration:"
 echo "https://${AWS_REGION}.console.aws.amazon.com/ec2/autoscaling/home?region=${AWS_REGION}#LaunchConfigurations:"
+echo ""
+
+# Propose auto scaling group name:
+TODAY=$(gnudate -d "today 13:00 " "+%Y-%m-%d")
+# lc-nginx-letsencrypt-node-2016-06-14
+AG_BASE_NAME=${LAUNCH_CONFIG_NAME//lc-/}
+AG_BASE_NAME=${AG_BASE_NAME//-????-??-[0-9]*/}
+AG_NAME="ag-${AG_BASE_NAME}"
+if [ ! -z "$AWS_PROFILE" ];then
+    LC_PROFILE="-p ${AWS_PROFILE//--profile /} "
+fi
+if [ ! -z "$KEY_PAIR" ];then
+    LC_KEY_PAIR="-k ${KEY_PAIR} "
+fi
+echo ""
+echo "--------------------------------------------------------------------"
+echo "Next you should run create-auto-scaling-group.sh:"
+echo "Usage:"
+echo "    $ bash ./create-auto-scaling-group.sh ${LC_PROFILE}${LC_KEY_PAIR}"
+echo "        -s <comma separated list of subnets>"
+echo "        -l ${LAUNCH_CONFIG_NAME}"
+echo "        -n ${AG_NAME}"
+echo ""
+echo "You can just run this and it will guide you through the rest:"
+echo "    $ bash ./create-auto-scaling-group.sh ${LC_PROFILE}${LC_KEY_PAIR}-l ${LAUNCH_CONFIG_NAME} -n ${AG_NAME}"
 echo ""
