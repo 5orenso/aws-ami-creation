@@ -1,32 +1,30 @@
 #!/usr/bin/env bash
 
 # Read command line input:
-while [[ $# > 1 ]]
-do
-key="$1"
-
-case $key in
-    -h|--help)
-    HELP="$2"
-    shift # past argument
-    ;;
-    -n|--role-name)
-    AWS_ROLE="$2"
-    shift # past argument
-    ;;
-    -r|--aws-region)
-    AWS_REGION="$2"
-    shift # past argument
-    ;;
-    -p|--aws-profile)
-    AWS_PROFILE="$2"
-    shift # past argument
-    ;;
-    *)
-    # unknown option
-    ;;
-esac
-shift # past argument or value
+while [[ $# > 1 ]]; do
+    key="$1"
+    case $key in
+        -h|--help)
+            HELP="$2"
+            shift # past argument
+        ;;
+        -n|--role-name)
+            AWS_ROLE="$2"
+            shift # past argument
+        ;;
+        -r|--aws-region)
+            AWS_REGION="$2"
+            shift # past argument
+        ;;
+        -p|--aws-profile)
+            AWS_PROFILE="$2"
+            shift # past argument
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+    shift # past argument or value
 done
 
 if [ ! -z "$HELP" ]; then

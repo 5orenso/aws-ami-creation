@@ -1,64 +1,62 @@
 #!/usr/bin/env bash
 
 # Read command line input:
-while [[ $# > 1 ]]
-do
-key="$1"
-
-case $key in
-    -h|--help)
-    HELP="$2"
-    shift # past argument
-    ;;
-    -n|--auto-scaling-group-name)
-    AUTO_SCALING_GROUP_NAME="$2"
-    shift # past argument
-    ;;
-    -l|--launch-config-name)
-    LAUNCH_CONFIG_NAME="$2"
-    shift # past argument
-    ;;
-    -c|--cooldown)
-    COOLDOWN="$2"
-    shift # past argument
-    ;;
-    -m|--size-min)
-    SIZE_MIN="$2"
-    shift # past argument
-    ;;
-    -M|--size-max)
-    SIZE_MAX="$2"
-    shift # past argument
-    ;;
-    -d|--size-desired)
-    SIZE_DESIRED="$2"
-    shift # past argument
-    ;;
-    -h|--health-check-grace)
-    HEALTH_CHECK_GRACE_PERIODE="$2"
-    shift # past argument
-    ;;
-    -s|--subnet-list)
-    SUBNET_LIST="$2"
-    shift # past argument
-    ;;
-    -r|--aws-region)
-    AWS_REGION="$2"
-    shift # past argument
-    ;;
-    -p|--aws-profile)
-    AWS_PROFILE="$2"
-    shift # past argument
-    ;;
-    -b|--load-balancer-name)
-    LOAD_BALANCER_NAME="$2"
-    shift # past argument
-    ;;
-    *)
-    # unknown option
-    ;;
-esac
-shift # past argument or value
+while [[ $# > 1 ]]; do
+    key="$1"
+    case $key in
+        -h|--help)
+            HELP="$2"
+            shift # past argument
+        ;;
+        -n|--auto-scaling-group-name)
+            AUTO_SCALING_GROUP_NAME="$2"
+            shift # past argument
+        ;;
+        -l|--launch-config-name)
+            LAUNCH_CONFIG_NAME="$2"
+            shift # past argument
+        ;;
+        -c|--cooldown)
+            COOLDOWN="$2"
+            shift # past argument
+        ;;
+        -m|--size-min)
+            SIZE_MIN="$2"
+            shift # past argument
+        ;;
+        -M|--size-max)
+            SIZE_MAX="$2"
+            shift # past argument
+        ;;
+        -d|--size-desired)
+            SIZE_DESIRED="$2"
+            shift # past argument
+        ;;
+        -h|--health-check-grace)
+            HEALTH_CHECK_GRACE_PERIODE="$2"
+            shift # past argument
+        ;;
+        -s|--subnet-list)
+            SUBNET_LIST="$2"
+            shift # past argument
+        ;;
+        -r|--aws-region)
+            AWS_REGION="$2"
+            shift # past argument
+        ;;
+        -p|--aws-profile)
+            AWS_PROFILE="$2"
+            shift # past argument
+        ;;
+        -b|--load-balancer-name)
+            LOAD_BALANCER_NAME="$2"
+            shift # past argument
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+    shift # past argument or value
 done
 
 if [ ! -z "$HELP" ]; then
