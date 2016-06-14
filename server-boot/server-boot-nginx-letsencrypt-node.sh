@@ -11,7 +11,7 @@ export LC_ALL=en_US.UTF-8
 #
 # NB! Do not upload the secret file to any public repo!
 #
-if [ ! -z "$ELASTIC_IP_ALLOCATION_ID" ]
+if [ ! -z "$ELASTIC_IP_ALLOCATION_ID" ]; then
     # Associate Elastic IP with instance if not associated before.
     INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
     CURRENT_INSTANCE_ID=$(/usr/bin/aws ec2 describe-addresses --allocation-ids $ELASTIC_IP_ALLOCATION_ID --region eu-west-1 | jq -r '.Addresses[].InstanceId')
@@ -28,7 +28,7 @@ git clone https://github.com/5orenso/node-express-boilerplate.git
 
 # Install all packages
 cd /srv/node-express-boilerplate/
-npm install
+npm install --production
 
 # Install the application:
 chown ubuntu:ubuntu /srv/node-express-boilerplate/
@@ -43,7 +43,8 @@ module.exports = {
     logLevel: 'debug', // debug, verbose, info
     app: {
         port: 8080,
-        logFile: '/tmp/access.log'
+        logFile: '/tmp/access.log',
+        domain: '${COOKIE_DOMAIN}'
     },
     useDataDog: true
 };
@@ -117,45 +118,91 @@ service node-express-boilerplate start
 
 
 # Nginx and letsencrypt setup
-#cat > /etc/nginx/sites-available/default <<'EOF'
-## Inside the server block, add this location block:
-## Add to SSL server block
-#        location ~ /.well-known {
-#                allow all;
-#        }
-#EOF
+cat > /etc/nginx/sites-available/default <<'EOF'
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server ipv6only=on;
+
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+
+        # Make site accessible from http://localhost/
+        server_name localhost;
+
+        location / {
+            # First attempt to serve request as file, then
+            # as directory, then fall back to displaying a 404.
+            try_files $uri $uri/ =404;
+        }
+        location ~ /.well-known {
+            allow all;
+        }
+}
+EOF
 service nginx reload
 
+cd /opt/certbot
+./certbot-auto certonly --agree-tos --email ${CERT_EMAIL} -a webroot --webroot-path=/usr/share/nginx/html -d ${CERT_DOMAIN} ${CERT_ADDITIONAL_DOMAINS}
+#ls -al /etc/letsencrypt/live/tools.flyfisheurope.com/fullchain.pem
 
-#cd /opt/certbot
-#./certbot-auto certonly --standalone --email admin@example.com -a webroot --webroot-path=/usr/share/nginx/html -d example.com -d www.example.com -d other.example.net
 
+cat > /etc/nginx/sites-available/default <<'EOF'
+server {
+    listen 443 ssl;
+    server_name ${CERT_DOMAIN} ${CERT_ADDITIONAL_DOMAINS//-d/};
 
-#cat > /etc/nginx/sites-available/default <<'EOF'
-#listen 443 ssl;
-#
-#        server_name example.com www.example.com;
-#
-#        ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-#        ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
-#
-# ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-#        ssl_prefer_server_ciphers on;
-#        ssl_dhparam /etc/ssl/certs/dhparam.pem;
-#        ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
-#        ssl_session_timeout 1d;
-#        ssl_session_cache shared:SSL:50m;
-#        ssl_stapling on;
-#        ssl_stapling_verify on;
-#        add_header Strict-Transport-Security max-age=15768000;
-#
-#server {
-#    listen 80;
-#    server_name example.com www.example.com;
-#    return 301 https://$host$request_uri;
-#}
-#EOF
+    root /usr/share/nginx/html;
+    index index.html index.htm;
 
+    ssl_certificate /etc/letsencrypt/live/${CERT_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${CERT_DOMAIN}/privkey.pem;
+
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    add_header Strict-Transport-Security max-age=15768000;
+
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        # try_files $uri $uri/ =404;
+        proxy_pass http://localhost:8080;
+        proxy_pass_header Server;
+        proxy_redirect off;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_set_header REMOTE_ADDR $remote_addr;
+    }
+    location ~ /.well-known {
+        allow all;
+    }
+}
+
+server {
+    listen 80;
+    server_name ${CERT_DOMAIN} ${CERT_ADDITIONAL_DOMAINS//-d/};
+    return 301 https://$host$request_uri;
+}
+
+EOF
 service nginx reload
 
+# Test SSL
+# https://www.ssllabs.com/ssltest/analyze.html?d=${CERT_DOMAIN}
+
+# Schedule regular update of letsencrypt certs.
+read -r -d '' ROOT_CRONTAB_LINES <<- EOM
+MAILTO=${CERT_EMAIL}
+
+30 2 * * 1 /opt/certbot/certbot-auto renew >> /var/log/le-renew.log
+35 2 * * 1 /etc/init.d/nginx reload
+EOM
+
+(crontab -l; echo "$ROOT_CRONTAB_LINES" ) | crontab -u root -
 
