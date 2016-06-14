@@ -38,6 +38,8 @@ chown www-data.www-data /var/log/Zu-CMS/ /var/run/zu/ /var/log/zu/ /srv/Zu-CMS/l
 chown www-data:www-data /srv/Zu-CMS/
 chmod 755 /srv/Zu-CMS/
 
+aws s3 sync s3://ffe-visma-import/ /srv/Zu-CMS/example/ --region eu-west-1
+
 service zu start
 
 # --> FFE-CMS
@@ -239,7 +241,11 @@ ${DOWNLOAD_AND_PARSE_VISMA_FILES}
 
 # Copy files from AWS S3
 30 * * * *  /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync-down.log
-35 * * * * /bin/chown -R www-data.www-data /var/www/www.flyfisheurope.com/images/ >> /home/ubuntu/aws-chown-images.log
+35 * * * *  /bin/chown -R www-data.www-data /var/www/www.flyfisheurope.com/images/ >> /home/ubuntu/aws-chown-images.log
+
+# Copy import scripts from AWS S3
+40 1 * * *  /usr/bin/aws s3 sync s3://ffe-visma-import/ /srv/Zu-CMS/example/ --exclude "*" --include "*.js" --region eu-west-1
+40 2 * * *  /usr/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/zu/cli/log/ s3://ffe-visma-import-logs/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 
 EOM
 
