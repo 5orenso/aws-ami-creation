@@ -21,7 +21,7 @@ get_next_num() {
 get_new_image_name() {
     IMAGE_STAMP=`date +%Y-%m-%d`
     IMAGE_BASE_NAME=$1-${IMAGE_STAMP}
-    IMAGE_NEXT_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=${IMAGE_BASE_NAME}*" \
+    IMAGE_NEXT_ID=$(aws ec2 describe-images --region eu-west-1 --owners self --filters "Name=name,Values=${IMAGE_BASE_NAME}*" \
         | jq -r '.Images[].Name' \
         | cut -d'_' -f2 \
         | get_next_num)
