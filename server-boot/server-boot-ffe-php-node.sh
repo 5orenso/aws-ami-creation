@@ -13,6 +13,16 @@ if [[ $CURRENT_INSTANCE_ID == null ]] ; then
 fi
 
 # ----------------------------------------------------------------
+# Update hostfile
+cat >> /etc/hosts <<'EOF'
+# MongoDB setup.
+172.30.2.250        mongo0.flyfisheurope.com
+172.30.1.250        mongo1.flyfisheurope.com
+172.30.0.250        mongo2.flyfisheurope.com
+EOF
+
+
+# ----------------------------------------------------------------
 # Get the applications and configs you want to run on this server:
 cd /srv/
 git clone $GIT_REPO_CONFIG
