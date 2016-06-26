@@ -10,6 +10,11 @@ DOWNLOAD_AND_PARSE_VISMA_FILES='# Do nothing. Only fetch these files on 1 server
 if [[ $CURRENT_INSTANCE_ID == null ]] ; then
     /usr/bin/aws ec2 associate-address --instance-id $INSTANCE_ID --allocation-id $ELASTIC_IP_ALLOCATION_ID --allow-reassociation --region eu-west-1
     DOWNLOAD_AND_PARSE_VISMA_FILES='2,7,12,17,22,27,32,37,42,47,52,57 * * * * /bin/bash /var/www/dealer.flyfisheurope.com/zu/cli/download_xml_files.sh >> /var/www/dealer.flyfisheurope.com/zu/cli/log/download_xml_files.`/bin/date +\%Y\%m\%d`.log 2>&1'
+
+    mkdir /home/ubuntu/weborder_S3/
+    chown ubuntu.ubuntu /home/ubuntu/weborder_S3/
+    /usr/bin/aws s3 sync s3://ffe-bin/ /home/ubuntu/ --region eu-west-1
+    EXPORT_WEBORDERS_TO_S3='0 1 * * *  /bin/bash /home/ubuntu/weborder_export.sh'
 fi
 
 # ----------------------------------------------------------------
@@ -256,6 +261,9 @@ ${DOWNLOAD_AND_PARSE_VISMA_FILES}
 # Copy import scripts from AWS S3
 40 1 * * *  /usr/bin/aws s3 sync s3://ffe-visma-import/ /srv/Zu-CMS/example/ --exclude "*" --include "*.js" --region eu-west-1
 40 2 * * *  /usr/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/zu/cli/log/ s3://ffe-visma-import-logs/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+
+# Export weborder history to S3
+${EXPORT_WEBORDERS_TO_S3}
 
 EOM
 
