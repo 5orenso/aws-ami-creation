@@ -200,7 +200,7 @@ service nginx reload
 read -r -d '' ROOT_CRONTAB_LINES <<- EOM
 MAILTO=${CERT_EMAIL}
 
-30 2 * * 1 /opt/certbot/certbot-auto renew >> /var/log/le-renew.log
+30 2 * * 1 /opt/certbot/certbot-auto --non-interactive renew >> /var/log/le-renew.log
 35 2 * * 1 /etc/init.d/nginx reload
 EOM
 
