@@ -2,7 +2,14 @@
 
 A simple approach to create Amazon Machine Images (AMI) you need for your AWS servers.
 
-I know there is Puppet, Chef and other tools out there to help you build images. 
+__Existing images:__
+* Basic Node.js image with the latest version.
+* MongoDB server image with a 3 node replica set.
+* Nginx with automated Letsencrypt certificate support.
+* MQTT broker for connection NodeMCU (ESP82866) with AWS IoT solution.
+
+
+I know there is Puppet, Chef and other tools out there to help you build images.
 But if you just want a nice, fast and simple way to create images with a minimum of effort,
 this is the way.
 
@@ -64,7 +71,7 @@ Next steps:
 
 ## Prerequisite
 
-Before you can run the command to create a new AMI you need to register an AWS account, 
+Before you can run the command to create a new AMI you need to register an AWS account,
 install the AWS CLI and install [jq](https://stedolan.github.io/jq/download/).
 
 _If you have brew you can install jq this way:_
