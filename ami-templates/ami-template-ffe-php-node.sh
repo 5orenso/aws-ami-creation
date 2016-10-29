@@ -65,6 +65,14 @@ cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
 sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
 sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
 
+# Install global modules needed
+npm install csv@0.3.7 -g
+npm install optimist -g
+npm install request -g
+npm install crypto -g
+npm install http-get -g
+npm install xml2js -g
+
 # Copy images from S3. It takes forever and should be done when we build the image.
 mkdir -p /var/www/www.flyfisheurope.com/images/cache/
 /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1
@@ -87,6 +95,8 @@ mkdir /var/www/lib/Guzzle/
 aws s3 sync s3://ffe-static-web/php/Guzzle/ /var/www/lib/Guzzle/ --region eu-west-1
 mkdir /var/www/lib/Symfony/
 aws s3 sync s3://ffe-static-web/php/Symfony/ /var/www/lib/Symfony/ --region eu-west-1
+aws s3 cp s3://ffe-static-web/php/phpqrcode-2010100721_1.1.4.zip /var/www/lib/phpqrcode-2010100721_1.1.4.zip --region eu-west-1
+unzip -d /var/www/lib/ /var/www/lib/phpqrcode-2010100721_1.1.4.zip
 # Change owner
 chown -R www-data.www-data /var/www/
 
