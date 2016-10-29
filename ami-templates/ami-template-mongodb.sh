@@ -198,9 +198,10 @@ echo -e "\nDone" >> $DIR/$DATE/output.log
 echo -e `/bin/date` >> $DIR/$DATE/output.log
 echo -e "-------------------------------------------------------------------------------\n" >> $DIR/$DATE/output.log
 
-/usr/bin/aws s3 sync /var/backups/mongodb/$HOSTNAME/ s3://ffe-mongodb-backups/$HOSTNAME/
+/usr/bin/aws --region eu-west-1 s3 sync /var/backups/mongodb/$HOSTNAME/ s3://ffe-mongodb-backups/$HOSTNAME/
 
 EOF
+chmod 755 /etc/cron.daily/mongodb
 
 # Turn of defrag option to speed up file system.
 cat > /etc/init.d/disable-transparent-hugepages <<'EOF'
