@@ -93,10 +93,16 @@ mkdir /var/www/www.flyfisheurope.com/test/
 /usr/bin/aws s3 cp s3://ffe-static-web/index_dealer.html /var/www/www.flyfisheurope.com/index_dealer.html --region eu-west-1
 /usr/bin/aws s3 cp s3://ffe-static-web/favicon.ico /var/www/www.flyfisheurope.com/favicon.ico --region eu-west-1
 /usr/bin/aws s3 cp s3://ffe-static-web/img.php /var/www/www.flyfisheurope.com/img.php --region eu-west-1
+/usr/bin/aws s3 sync s3://ffe-static-web/qrcodes /var/www/www.flyfisheurope.com/zu/qrcodes --region eu-west-1
 
 ln -s /var/www/www.flyfisheurope.com/images /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/files
+mv /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/index.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/index.php.old
+mv /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/UploadHandler.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/UploadHandler.php.old
 ln -s /var/www/www.flyfisheurope.com/zu/jquery-file-upload/index.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/.
 ln -s /var/www/www.flyfisheurope.com/zu/jquery-file-upload/UploadHandler.php /var/www/www.flyfisheurope.com/jquery-file-upload/server/php/.
+
+mkdir /var/www/www.flyfisheurope.com/server
+ln -s /var/www/www.flyfisheurope.com/zu /var/www/www.flyfisheurope.com/server/php
 
 # dev.zu.no
 # git clone creates the target folder with mkdir -p
@@ -117,7 +123,10 @@ ln -s /var/www/dev.zu.no/zu/view/consumer_web/css /var/www/dev.zu.no/css
 ln -s /var/www/dev.zu.no/zu/view/consumer_web/js /var/www/dev.zu.no/js
 ln -s /var/www/dev.zu.no/zu/view/consumer_web/posters /var/www/dev.zu.no/posters
 ln -s /var/www/dev.zu.no/zu/view/consumer_web/img /var/www/dev.zu.no/imgs
-ln -s /var/www/dev.zu.no/zu/qrcodes /var/www/dev.zu.no/qrcodes
+ln -s /var/www/www.flyfisheurope.com/zu/qrcodes /var/www/dev.zu.no/qrcodes
+
+mkdir /var/www/dev.zu.no/server
+ln -s /var/www/dev.zu.no/zu /var/www/dev.zu.no/server/php
 
 # dealer.flyfisheurope.com
 # git clone creates the target folder with mkdir -p
@@ -138,9 +147,12 @@ ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/css /var/www/dealer
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/js /var/www/dealer.flyfisheurope.com/js
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/posters /var/www/dealer.flyfisheurope.com/posters
 ln -s /var/www/dealer.flyfisheurope.com/zu/view/consumer_web/img /var/www/dealer.flyfisheurope.com/imgs
-ln -s /var/www/dealer.flyfisheurope.com/zu/qrcodes /var/www/dealer.flyfisheurope.com/qrcodes
+ln -s /var/www/www.flyfisheurope.com/zu/qrcodes /var/www/dealer.flyfisheurope.com/qrcodes
 mkdir /var/www/dealer.flyfisheurope.com/visma
 mkdir /var/www/dealer.flyfisheurope.com/zu/cli/log/
+
+mkdir /var/www/dealer.flyfisheurope.com/server
+ln -s /var/www/dealer.flyfisheurope.com/zu /var/www/dealer.flyfisheurope.com/server/php
 
 # Chown
 chown -R www-data.www-data /var/www/
@@ -250,16 +262,19 @@ ${DOWNLOAD_AND_PARSE_VISMA_FILES}
 40 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/jquery-file-upload/ s3://ffe-static-web/jquery-file-upload/ --exclude "server/php/files/*" --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 50 1 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/sizechart/          s3://ffe-static-web/sizechart/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 10 2 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/test/               s3://ffe-static-web/test/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
+10 2 * * *  /usr/bin/aws s3 sync /var/www/www.flyfisheurope.com/qrcodes/            s3://ffe-static-web/qrcodes/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 20 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/index.html          s3://ffe-static-web/index.html --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 30 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/favicon.ico         s3://ffe-static-web/favicon.ico --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 40 2 * * *  /usr/bin/aws s3 cp   /var/www/www.flyfisheurope.com/img.php             s3://ffe-static-web/img.php --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 
 # Copy files from AWS S3
-30 * * * *  /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync-down.log
-35 * * * *  /bin/chown -R www-data.www-data /var/www/www.flyfisheurope.com/images/ >> /home/ubuntu/aws-chown-images.log
+*/5 * * * *  /usr/bin/aws s3 sync s3://ffe-static-web/images/ /var/www/www.flyfisheurope.com/images/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync-down.log
+30 * * * *  /usr/bin/aws s3 sync s3://ffe-static-web/qrcodes/ /var/www/www.flyfisheurope.com/qrcodes/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync-down.log
+*/5 * * * *  /bin/chown -R www-data.www-data /var/www/www.flyfisheurope.com/images/ >> /home/ubuntu/aws-chown-images.log
 
 # Copy import scripts from AWS S3
 40 1 * * *  /usr/bin/aws s3 sync s3://ffe-visma-import/ /srv/Zu-CMS/example/ --exclude "*" --include "*.js" --region eu-west-1
+40 1 * * *  /usr/bin/aws s3 sync s3://ffe-visma-import/ /srv/Zu-CMS/example/ --exclude "*" --include "*.json" --region eu-west-1
 40 2 * * *  /usr/bin/aws s3 sync /var/www/dealer.flyfisheurope.com/zu/cli/log/ s3://ffe-visma-import-logs/ --region eu-west-1 >> /home/ubuntu/aws-s3-sync.log
 
 # Export weborder history to S3
