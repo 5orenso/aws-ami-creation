@@ -22,7 +22,7 @@ __An auto scaled server setup in 5 steps:__
 5. [create-auto-scaling-group.sh](docs/auto-scaling-group.md) : Create an Auto Scaling Group.
 
 
-## Get started
+## Geting started
 
 Make sure all [Prerequisite](#user-content-prerequisite) are fullfilled.
 
@@ -33,7 +33,7 @@ $ bash ./create-ami-creator-role.sh
 
 __To get started creating a basic Ubuntu Node.js AMI, simply type:__
 ```bash
-$ bash ./create-ami.sh -u ami-template-node.sh
+$ bash ./create-ami.sh -u ami-templates/ami-template-node.sh
 ```
 
 __Options:__
@@ -54,7 +54,7 @@ __Options:__
 __Example:__
 ```bash
 $ bash ./create-ami.sh \
-    -u ami-template-node.sh \
+    -u ami-templates/ami-template-node.sh \
     -k my-key-pair \
     -i role-ami-creator
 ```
