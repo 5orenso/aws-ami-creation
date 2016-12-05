@@ -36,6 +36,21 @@ __To get started creating a basic Ubuntu Node.js AMI, simply type:__
 $ bash ./create-ami.sh -u ami-template-node.sh
 ```
 
+__Options:__
+```bash
+    [-h|--help 1]
+    [-b|--base-image <ami id>]
+    [-g|--security-group <id of security group>]
+    -i|--iam-profile <iam profile for image creation>
+    -k|--key-pair <name of key-pair>
+    [-s|--subnet <subnet id>]
+    [-t|--instance-type <instance type>]
+    -u|--user-data-file <ami template file>
+    [-r|--aws-region <awd region>]
+    [-p|--aws-profile <aws profile>]
+```
+
+
 __Example:__
 ```bash
 $ bash ./create-ami.sh \
