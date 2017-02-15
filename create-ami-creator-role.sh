@@ -60,6 +60,10 @@ echo "Attaching inline policy amiCreatorCreateImage."
 aws iam put-role-policy $AWS_PROFILE --region $AWS_REGION --role-name $AWS_ROLE --policy-name amiCreatorCreateImage --policy-document file://policies/policy-ec2-create-image.json
 echo "Attaching inline policy amiCreatorCreateTags."
 aws iam put-role-policy $AWS_PROFILE --region $AWS_REGION --role-name $AWS_ROLE --policy-name amiCreatorCreateTags --policy-document file://policies/policy-ec2-create-tags.json
+echo "Attaching inline policy amiCreatorIoT."
+aws iam put-role-policy $AWS_PROFILE --region $AWS_REGION --role-name $AWS_ROLE --policy-name amiCreatorCreateIot --policy-document file://policies/policy-iot-all.json
+echo "Attaching inline policy amiCreatorIam."
+aws iam put-role-policy $AWS_PROFILE --region $AWS_REGION --role-name $AWS_ROLE --policy-name amiCreatorCreateIam --policy-document file://policies/policy-iam.json
 
 CREATE_PROFILE_RESULT=$(aws iam create-instance-profile $AWS_PROFILE --region $AWS_REGION --instance-profile-name $AWS_ROLE)
 echo "Profile created : ${CREATE_PROFILE_RESULT}"
