@@ -87,7 +87,7 @@ ln -s /var/www/lib/Twig-1.24.1 /var/www/lib/Twig
 aws s3 cp s3://ffe-static-web/php/aws.phar /var/www/lib/aws.phar --region eu-west-1
 aws s3 cp s3://ffe-static-web/php/PHPExcel_1.8.0.zip /var/www/lib/PHPExcel_1.8.0.zip --region eu-west-1
 unzip /var/www/lib/PHPExcel_1.8.0.zip -d /var/www/lib/
-ln -s /var/www/lib/Classes /var/www/lib/PHPExcel
+ln -s /var/www/lib/Classes/PHPExcel /var/www/lib/PHPExcel
 aws s3 cp s3://ffe-static-web/php/aws-autoloader.php /var/www/lib/aws-autoloader.php --region eu-west-1
 mkdir  /var/www/lib/Aws/
 aws s3 sync s3://ffe-static-web/php/Aws/ /var/www/lib/Aws/ --region eu-west-1
