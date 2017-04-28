@@ -111,7 +111,7 @@ respawn
 respawn limit 10 5    # Die if respawn more than 10 times in 5 sec.
 
 script
-    exec /usr/local/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
+    exec /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
 end script
 
 #-----[ HOWTO ]--------------------------------------------------
