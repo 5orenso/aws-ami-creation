@@ -136,7 +136,7 @@ fi
 # Default values
 AWS_REGION=${AWS_REGION:-'eu-west-1'}
 # This is the Ubuntu base image provided by AWS. No changes needed unless you want another version.
-BASE_IMAGE=${BASE_IMAGE:-'ami-47a23a30'}
+BASE_IMAGE=${BASE_IMAGE:-'ami-6f587e1c'}
 # Instance type. Default is fine.
 INSTANCE_TYPE=${INSTANCE_TYPE:-'m3.medium'}
 
