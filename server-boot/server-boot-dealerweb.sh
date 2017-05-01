@@ -3,6 +3,15 @@
 export LC_ALL=en_US.UTF-8
 
 # ----------------------------------------------------------------
+# Update hostfile
+cat >> /etc/hosts <<'EOF'
+# MongoDB setup.
+172.30.2.250        mongo0.flyfisheurope.com
+172.30.1.250        mongo1.flyfisheurope.com
+172.30.0.250        mongo2.flyfisheurope.com
+EOF
+
+# ----------------------------------------------------------------
 # Get the application you want to run on this server:
 mkdir /srv/
 cd /srv/
