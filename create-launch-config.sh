@@ -265,6 +265,7 @@ LC_RUN_OUTPUT=$(aws autoscaling create-launch-configuration $AWS_PROFILE \
     --instance-monitoring Enabled=$CLOUDWATCH_MONITORING \
     --$EBS_OPTIMIZED \
     --iam-instance-profile $IAM_PROFILE \
+    --associate-public-ip-address \
     --block-device-mappings file://block-device-mapping.json)
 
 echo $LC_RUN_OUTPUT
