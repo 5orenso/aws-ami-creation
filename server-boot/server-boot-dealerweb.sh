@@ -11,6 +11,110 @@ cat >> /etc/hosts <<'EOF'
 172.30.0.250        mongo2.flyfisheurope.com
 EOF
 
+# Install telegraph
+# TODO: Move to Node.js image.
+cd /tmp/
+wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
+dpkg -i telegraf_1.2.1_amd64.deb
+
+# Fix telegraph config
+cat > /etc/telegraf/telegraf.conf <<'EOF'
+# Telegraf Configuration
+
+# Global tags can be specified here in key="value" format.
+[global_tags]
+  # dc = "us-east-1" # will tag all metrics with dc=us-east-1
+
+# Configuration for telegraf agent
+[agent]
+  interval = "10s"
+  round_interval = true
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  collection_jitter = "0s"
+  flush_interval = "10s"
+  flush_jitter = "0s"
+  precision = ""
+  debug = false
+  quiet = false
+  logfile = ""
+
+  hostname = ""
+  omit_hostname = false
+
+###############################################################################
+#                            OUTPUT PLUGINS                                   #
+###############################################################################
+
+# Configuration for influxdb server to send metrics to
+[[outputs.influxdb]]
+  urls = ["http://172.30.1.231:8086"] # required
+  database = "telegraf" # required
+  retention_policy = ""
+  write_consistency = "any"
+  timeout = "5s"
+  username = "telegraf"
+  password = "telegraf"
+
+###############################################################################
+#                            INPUT PLUGINS                                    #
+###############################################################################
+
+# Read metrics about cpu usage
+[[inputs.cpu]]
+  percpu = true
+  totalcpu = true
+  collect_cpu_time = false
+
+# Read metrics about disk usage by mount point
+[[inputs.disk]]
+  ignore_fs = ["tmpfs", "devtmpfs"]
+
+
+# Read metrics about disk IO by device
+[[inputs.diskio]]
+  # no configuration
+
+# Get kernel statistics from /proc/stat
+[[inputs.kernel]]
+  # no configuration
+
+# Read metrics about memory usage
+[[inputs.mem]]
+  # no configuration
+
+# Get the number of processes and group them by status
+[[inputs.processes]]
+  # no configuration
+
+# Read metrics about swap memory usage
+[[inputs.swap]]
+  # no configuration
+
+# Read metrics about system load & uptime
+[[inputs.system]]
+  # no configuration
+
+# Statsd Server
+[[inputs.statsd]]
+  service_address = ":8125"
+  delete_gauges = true
+  delete_counters = true
+  delete_sets = false
+  delete_timings = true
+  percentiles = [90]
+  metric_separator = "_"
+  parse_data_dog_tags = false
+  templates = [
+      "cpu.* measurement*"
+  ]
+  allowed_pending_messages = 10000
+  percentile_limit = 1000
+  udp_packet_size = 1500
+
+EOF
+
+
 # ----------------------------------------------------------------
 # Get the application you want to run on this server:
 mkdir /srv/
@@ -66,7 +170,7 @@ console log
 
 script
     echo $$ > /var/run/Zu-CMS/Zu-CMS.pid
-    exec /usr/local/bin/node /srv/Zu-CMS/app/server.js -c /srv/config/ffe/Zu-CMS/zu/config.js  >> /var/log/Zu-CMS/Zu-CMS.log 2>&1
+    exec /usr/local/bin/node /srv/Zu-CMS/server.js -c /srv/config/ffe/Zu-CMS/zu/config.js  >> /var/log/Zu-CMS/Zu-CMS.log 2>&1
 end script
 
 pre-start script
