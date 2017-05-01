@@ -114,6 +114,9 @@ cat > /etc/telegraf/telegraf.conf <<'EOF'
 
 EOF
 
+# Restart telegraf service:
+service telegraf start
+
 
 # ----------------------------------------------------------------
 # Get the application you want to run on this server:
