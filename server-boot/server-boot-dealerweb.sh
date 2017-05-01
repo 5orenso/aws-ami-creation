@@ -115,6 +115,7 @@ cat > /etc/telegraf/telegraf.conf <<'EOF'
 EOF
 
 # Restart telegraf service:
+service telegraf stop
 service telegraf start
 
 
