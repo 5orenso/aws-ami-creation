@@ -11,12 +11,6 @@ cat >> /etc/hosts <<'EOF'
 172.30.0.250        mongo2.flyfisheurope.com
 EOF
 
-# Install telegraph
-# TODO: Move to Node.js image.
-cd /tmp/
-wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
-dpkg -i telegraf_1.2.1_amd64.deb
-
 # Fix telegraph config
 cat > /etc/telegraf/telegraf.conf <<'EOF'
 # Telegraf Configuration

@@ -54,6 +54,11 @@ sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
 # Datadog
 #DD_API_KEY=xxxxxyyyyzzzzz bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
 
+# Telegraf
+cd /tmp/
+wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
+dpkg -i telegraf_1.2.1_amd64.deb
+
 # Cloudwatch logs
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 cat > /tmp/awslogs.conf <<'EOF'
