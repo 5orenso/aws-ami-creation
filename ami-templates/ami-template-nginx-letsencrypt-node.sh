@@ -73,6 +73,10 @@ git clone https://github.com/certbot/certbot.git /opt/certbot
 # Generate stronger cert
 sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 
+# Set timedatectl
+sudo timedatectl set-timezone Europe/Oslo
+sudo timedatectl set-ntp on
+
 # Create AMI
 IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1

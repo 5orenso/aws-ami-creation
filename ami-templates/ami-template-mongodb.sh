@@ -239,6 +239,9 @@ EOF
 sudo chmod 755 /etc/init.d/disable-transparent-hugepages
 sudo update-rc.d disable-transparent-hugepages defaults
 
+sudo timedatectl set-timezone Europe/Oslo
+sudo timedatectl set-ntp on
+
 # Cron - from the repo
 read -r -d '' ROOT_CRONTAB_LINES <<- EOM
 # Cleanup old backups.

@@ -67,5 +67,9 @@ state_file = /var/awslogs/state/agent-state
 EOF
 python ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
 
+# Set timedatectl
+sudo timedatectl set-timezone Europe/Oslo
+sudo timedatectl set-ntp on
+
 IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1

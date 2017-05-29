@@ -181,3 +181,7 @@ Manual steps:
     $ sudo halt
 
 EOF
+
+# Set timedatectl
+sudo timedatectl set-timezone Europe/Oslo
+sudo timedatectl set-ntp on
