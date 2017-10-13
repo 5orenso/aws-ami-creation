@@ -9,6 +9,8 @@ ELASTIC_IP=52.17.86.89
 INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
 aws ec2 associate-address --instance-id $INSTANCE_ID --public-ip $ELASTIC_IP --allow-reassociation
 
+mkdir /root/.node-gyp/
+
 # ----------------------------------------------------------------
 # Get the application you want to run on this server:
 mkdir /srv/
@@ -18,7 +20,7 @@ git clone https://github.com/5orenso/simple-blog.git
 
 # Install all packages
 cd /srv/simple-blog/
-npm install
+npm install --unsafe-perm
 
 # Install the application:
 chown ubuntu:ubuntu /srv/simple-blog/
