@@ -2,7 +2,7 @@
 
 export LC_ALL=en_US.UTF-8
 
-export USER=ubuntu
+export USER=root
 
 # Associate IP (data is pushed to this IP from Oracle etc)
 ELASTIC_IP=52.17.86.89
@@ -34,7 +34,7 @@ mkdir /srv/config/
 
 # Add crontab entries
 read -r -d '' CRONTAB_LINES <<- EOM
-1,31 * * * *  /usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog-sitemap-next-telia-no.js > /dev/null 2>&1
+1,31 * * * *  /usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/litt.no/config.js > /dev/null 2>&1
 EOM
 (crontab -l; echo "$CRONTAB_LINES" ) | crontab -u ubuntu -
 
@@ -53,7 +53,7 @@ chown ubuntu:ubuntu /var/run/simple-blog
 chmod u+w /var/run/simple-blog
 
 # Startup script
-cat > /etc/init/simple-blog-next-telia-no.conf <<'EOF'
+cat > /etc/init/simple-blog-litt-no.conf <<'EOF'
 # ----------------------------------------------------------------------
 # datapiper - instance
 #
@@ -71,24 +71,24 @@ setgid ubuntu
 console log
 
 script
-    echo $$ > /var/run/simple-blog/simple-blog-next.telia.no.pid
-    exec /usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog-next.telia.no.js  >> /var/log/simple-blog/simple-blog-next.telia.no.log 2>&1
+    echo $$ > /var/run/simple-blog/simple-blog-litt.no.pid
+    exec /usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/litt.no/config.js  >> /var/log/simple-blog/simple-blog-litt.no.log 2>&1
 end script
 
 pre-start script
     # Date format same as (new Date()).toISOString() for consistency
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> /var/log/simple-blog/simple-blog-next.telia.no.log
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> /var/log/simple-blog/simple-blog-litt.no.log
 end script
 
 pre-stop script
-    rm /var/run/simple-blog/simple-blog-next.telia.no.pid
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> /var/log/simple-blog/simple-blog-next.telia.no.log
+    rm /var/run/simple-blog/simple-blog-litt.no.pid
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> /var/log/simple-blog/simple-blog-litt.no.log
 end script
 
 #-----[ HOWTO ]--------------------------------------------------
 # sudo cp upstart.conf /etc/init/simple-blog.conf
 # sudo initctl start simple-blog
-# sudo tail -f /var/log/simple-blog/simple-blog-next.telia.no.log
+# sudo tail -f /var/log/simple-blog/simple-blog-litt.no.log
 EOF
 
 # Logs to AWS Cloudwatch
@@ -115,7 +115,7 @@ EOF
 service awslogs restart
 
 # Run the application:
-service simple-blog-next-telia-no start
+service simple-blog-litt-no start
 
 
 # Cleanup as the ubuntu user
