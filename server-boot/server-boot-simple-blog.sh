@@ -2,6 +2,8 @@
 
 export LC_ALL=en_US.UTF-8
 
+export USER=ubuntu
+
 # Associate IP (data is pushed to this IP from Oracle etc)
 ELASTIC_IP=52.17.86.89
 INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
@@ -11,6 +13,7 @@ aws ec2 associate-address --instance-id $INSTANCE_ID --public-ip $ELASTIC_IP --a
 # Get the application you want to run on this server:
 mkdir /srv/
 cd /srv/
+git clone $GIT_REPO_CONFIG
 git clone https://github.com/5orenso/simple-blog.git
 
 # Install all packages
@@ -24,106 +27,10 @@ chmod 755 /srv/simple-blog/
 # Link the content folder
 mkdir /srv/simple-blog/content/
 chown ubuntu:ubuntu /srv/simple-blog/content/
-ln -s /home/ubuntu/Dropbox/websites/next.telia.no /srv/simple-blog/content/.
+ln -s /home/ubuntu/Dropbox/websites /srv/simple-blog/content
 
 # Config file
 mkdir /srv/config/
-
-cat > /srv/config/simple-blog-next.telia.no.js <<'EOF'
-module.exports = {
-    version: 1,
-    photoPath: '/srv/simple-blog/content/next.telia.no/images/',
-    blog: {
-        title: 'next.telia.no',
-        disqus: 'next-telia-no',
-        protocol: 'http',
-        domain: 'next.telia.no',
-        tags: 'IoT, DataLab, PurplePipe, Identity',
-        copyright: 'Copyright 2016 next.telia.no',
-        email: 'oistein.sorensen@telia.no',
-        searchResults: 'blog posts related to ',
-        showListOnIndex: 1,
-//        social: {
-//            twitter: 'https://twitter.com/sorenso',
-//            facebook: 'https://facebook.com/sorenso',
-//            googleplus: '',
-//            pintrest: '',
-//            instagram: 'http://instagram.com/sorenso'
-//        },
-        staticFilesPath: '/home/ubuntu/html/',
-        textFilesPath: '/home/ubuntu/text-files/',
-        topImage: false, // Don't use image[0] as top image on site. Use topImage instead.
-        simpleHeader: false, // Use simple header instead of top panorama
-        //googleAnalytics: 'UA-6268609-3',
-        googleTagManager: 'GTM-WZPRG9',
-        author: {
-            sorenso: {
-                image: '/pho/profile/fishOistein.jpg?w=50',
-                name: '<a href="https://twitter.com/sorenso">Sorenso</a>',
-            }
-        },
-        rewrites: [
-//            { url: '/wip4/.*', target: '/', code: 302 }
-        ]
-    },
-    app: {
-        port: 8080
-    },
-    template: {
-        blog: 'template/current/blog.html',
-        index: 'template/current/blog.html'
-    },
-    adapter: {
-        current: 'markdown',
-        markdown: {
-            contentPath: '/srv/simple-blog/content/next.telia.no/articles/',
-            photoPath: '/srv/simple-blog/content/next.telia.no/images/',
-            maxArticles: 50,
-        },
-        elasticsearch: {
-            server: 'search-tsn-insight-next-boqizt4pqm27qs5fhq5lzqrkvu.eu-west-1.es.amazonaws.com',
-            port: 9200,
-            index: 'next.telia.no',
-            type: 'article',
-            multiMatchType: 'most_fields',
-            multiMatchTieBreaker: 0.3
-        }
-    }
-};
-EOF
-
-# Add config-sitemap-next-telia-no.js
-cat > /srv/config/simple-blog-sitemap-next-telia-no.js <<'EOF'
-module.exports = {
-    version: 1,
-    blog: {
-        title: 'next.telia.no',
-        protocol: 'http',
-        domain: 'next.telia.no'
-    },
-    app: {
-        port: 8080
-    },
-    template: {
-        blog: 'template/current/blog.html',
-        index: 'template/current/blog.html'
-    },
-    adapter: {
-        current: 'markdown',
-        markdown: {
-            contentPath: '/srv/simple-blog/content/next.telia.no/articles/',
-            photoPath: '/srv/simple-blog/content/next.telia.no/images/',
-            maxArticles: 5000,
-        },
-        elasticsearch: {
-            server: 'search-tsn-insight-next-boqizt4pqm27qs5fhq5lzqrkvu.eu-west-1.es.amazonaws.com',
-            port: 80,
-            index: 'next.telia.no',
-            type: 'article'
-        }
-    }
-};
-EOF
 
 # Add crontab entries
 read -r -d '' CRONTAB_LINES <<- EOM

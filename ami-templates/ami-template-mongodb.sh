@@ -203,6 +203,24 @@ echo -e "-----------------------------------------------------------------------
 EOF
 chmod 755 /etc/cron.daily/mongodb
 
+# MongoDB cron-daily scripts
+mkdir /home/ubuntu/mongodb-cron-daily/
+chmod 755 /home/ubuntu/mongodb-cron-daily/
+
+cat > /etc/cron.daily/mongodb-scripts <<'EOF'
+#!/bin/bash
+
+SCRIPTS=/home/ubuntu/mongodb-cron-daily/
+
+/usr/bin/aws --region eu-west-1 s3 sync s3://ffe-mongodb-cron-daily/ $SCRIPTS
+
+for i in `find $SCRIPTS -name '*.js'` ; do
+    /usr/bin/mongo flyfish $i;
+done
+
+EOF
+chmod 755 /etc/cron.daily/mongodb-scripts
+
 # Turn of defrag option to speed up file system.
 cat > /etc/init.d/disable-transparent-hugepages <<'EOF'
 #!/bin/sh
