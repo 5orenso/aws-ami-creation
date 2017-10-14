@@ -134,16 +134,14 @@ EOF
 service simple-blog-${domain} start
 
 # Add crontab entries
-read -r -d '' CRONTAB_LINES <<- EOM
-1,31 * * * *  /usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/config-${domain}.js > /dev/null 2>&1
-EOM
-(crontab -l; echo "$CRONTAB_LINES" ) | crontab -u ubuntu -
+cat >> /etc/cron.hourly/simple-blog-sitemap.sh <<EOF
+/usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/config-${domain}.js > /dev/null 2>&1
+EOF
 
 cat >> /var/awslogs/etc/awslogs.conf <<EOF
-
-[/tmp/simple-blog-litt.no.log]
+[/tmp/simple-blog-${domain}.log]
 datetime_format = %Y-%m-%d %H:%M:%S
-file = /var/log/simple-blog/simple-blog-litt.no.log
+file = /var/log/simple-blog/simple-blog-${domain}.log
 buffer_duration = 5000
 log_stream_name = {instance_id}
 initial_position = start_of_file
@@ -153,4 +151,5 @@ EOF
 done < "/srv/config/simple-blog/active-domains.txt"
 # ---[ /ALL active domains ]--------------------------------------------------
 
+chmod 755 /etc/cron.hourly/simple-blog-sitemap.sh
 service awslogs restart
