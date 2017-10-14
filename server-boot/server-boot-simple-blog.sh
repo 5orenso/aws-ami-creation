@@ -111,7 +111,7 @@ console log
 
 script
     echo $$ > /var/run/simple-blog/simple-blog-${domain}.pid
-    exec /usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/${domain}/config-${domain}.js  >> /var/log/simple-blog/simple-blog-${domain}.log 2>&1
+    exec /usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/config-${domain}.js  >> /var/log/simple-blog/simple-blog-${domain}.log 2>&1
 end script
 
 pre-start script
