@@ -34,12 +34,6 @@ ln -s /home/ubuntu/Dropbox/websites /srv/simple-blog/content
 # Config file
 mkdir /srv/config/
 
-# Add crontab entries
-read -r -d '' CRONTAB_LINES <<- EOM
-1,31 * * * *  /usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/litt.no/config.js > /dev/null 2>&1
-EOM
-(crontab -l; echo "$CRONTAB_LINES" ) | crontab -u ubuntu -
-
 # Logging folders
 mkdir /srv/simple-blog/logs/
 chown ubuntu:ubuntu /srv/simple-blog/logs/
@@ -54,12 +48,55 @@ mkdir /var/run/simple-blog/
 chown ubuntu:ubuntu /var/run/simple-blog
 chmod u+w /var/run/simple-blog
 
+
+# Logs to AWS Cloudwatch
+cat > /var/awslogs/etc/awslogs.conf <<EOF
+[general]
+state_file = /var/awslogs/state/agent-state
+
+[/tmp/image-access.log]
+datetime_format = %Y-%m-%d %H:%M:%S
+file = /srv/simple-blog/logs/image-access.log
+buffer_duration = 5000
+log_stream_name = {instance_id}
+initial_position = start_of_file
+log_group_name = web/access
+
+[/tmp/image-access.log]
+datetime_format = %Y-%m-%d %H:%M:%S
+file = /srv/simple-blog/logs/image-access.log
+buffer_duration = 5000
+log_stream_name = {instance_id}
+initial_position = start_of_file
+log_group_name = web/access
+
+[/tmp/image-access.log]
+datetime_format = %Y-%m-%d %H:%M:%S
+file = /srv/simple-blog/logs/image-access.log
+buffer_duration = 5000
+log_stream_name = {instance_id}
+initial_position = start_of_file
+log_group_name = web/access
+
+[/tmp/image-access.log]
+datetime_format = %Y-%m-%d %H:%M:%S
+file = /srv/simple-blog/logs/image-access.log
+buffer_duration = 5000
+log_stream_name = {instance_id}
+initial_position = start_of_file
+log_group_name = web/access
+
+EOF
+
+# ---[ ALL active domains ]--------------------------------------------------
+while IFS= read -r domain; do
+  echo "$domain"
 # Startup script
-cat > /etc/init/simple-blog-litt-no.conf <<'EOF'
+cat > /etc/init/simple-blog-${domain}.conf <<EOF
 # ----------------------------------------------------------------------
-# datapiper - instance
+# simple-blog - instance
 #
-description     "simple-blog"
+description     "simple-blog-${domain}"
 
 start on (virtual-filesystems and net-device-up IFACE=eth0)
 stop on runlevel [06]
@@ -73,57 +110,47 @@ setgid ubuntu
 console log
 
 script
-    echo $$ > /var/run/simple-blog/simple-blog-litt.no.pid
-    exec /usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/litt.no/config.js  >> /var/log/simple-blog/simple-blog-litt.no.log 2>&1
+    echo $$ > /var/run/simple-blog/simple-blog-${domain}.pid
+    exec /usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/${domain}/config-${domain}.js  >> /var/log/simple-blog/simple-blog-${domain}.log 2>&1
 end script
 
 pre-start script
     # Date format same as (new Date()).toISOString() for consistency
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> /var/log/simple-blog/simple-blog-litt.no.log
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> /var/log/simple-blog/simple-blog-${domain}.log
 end script
 
 pre-stop script
-    rm /var/run/simple-blog/simple-blog-litt.no.pid
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> /var/log/simple-blog/simple-blog-litt.no.log
+    rm /var/run/simple-blog/simple-blog-${domain}.pid
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> /var/log/simple-blog/simple-blog-${domain}.log
 end script
 
 #-----[ HOWTO ]--------------------------------------------------
 # sudo cp upstart.conf /etc/init/simple-blog.conf
-# sudo initctl start simple-blog
-# sudo tail -f /var/log/simple-blog/simple-blog-litt.no.log
+# sudo initctl start simple-blog-${domain}
+# sudo tail -f /var/log/simple-blog/simple-blog-${domain}.log
 EOF
-
-# Logs to AWS Cloudwatch
-cat > /var/awslogs/etc/awslogs.conf <<'EOF'
-[general]
-state_file = /var/awslogs/state/agent-state
-
-[/tmp/apilog.log]
-datetime_format = %Y-%m-%d %H:%M:%S
-file = /var/log/simple-blog/simple-blog-next.telia.no.log
-buffer_duration = 5000
-log_stream_name = {instance_id}
-initial_position = start_of_file
-log_group_name = api/apilog.log
-
-[/tmp/request.log]
-datetime_format = %Y-%m-%d %H:%M:%S
-file = /srv/simple-blog/logs/web-access.log
-buffer_duration = 5000
-log_stream_name = {instance_id}
-initial_position = start_of_file
-log_group_name = api/request.log
-EOF
-service awslogs restart
 
 # Run the application:
-service simple-blog-litt-no start
+service simple-blog-${domain} start
 
+# Add crontab entries
+read -r -d '' CRONTAB_LINES <<- EOM
+1,31 * * * *  /usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/config-${domain}.js > /dev/null 2>&1
+EOM
+(crontab -l; echo "$CRONTAB_LINES" ) | crontab -u ubuntu -
 
-# Cleanup as the ubuntu user
-# service simple-blog-next-telia-no stop
-# rm -rf /srv/simple-blog/
-# rm /srv/config/simple-blog-next.telia.no.js
-# rm -rf /var/log/simple-blog/
-# rm -rf /var/run/simple-blog/
-# rm /etc/init/simple-blog-next-telia-no.conf
+cat >> /var/awslogs/etc/awslogs.conf <<EOF
+
+[/tmp/simple-blog-litt.no.log]
+datetime_format = %Y-%m-%d %H:%M:%S
+file = /var/log/simple-blog/simple-blog-litt.no.log
+buffer_duration = 5000
+log_stream_name = {instance_id}
+initial_position = start_of_file
+log_group_name = simple-blog
+EOF
+
+done < "/srv/config/simple-blog/active-domains.txt"
+# ---[ /ALL active domains ]--------------------------------------------------
+
+service awslogs restart
