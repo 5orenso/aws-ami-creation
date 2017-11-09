@@ -134,7 +134,7 @@ EOF
 service simple-blog-${domain} start
 
 # Add crontab entries
-cat >> /etc/cron.hourly/simple-blog-sitemap.sh <<EOF
+cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
 /usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/config-${domain}.js > /dev/null 2>&1
 EOF
 
