@@ -39,7 +39,7 @@ EC2_INSTANCE_ID=`get_ec2_instance_id`
 apt-get update
 
 # AWS tools and other software
-apt-get install jq awscli git make g++ htop itop dstat --yes
+apt-get install jq awscli git make g++ htop itop dstat unzip libwww-perl libdatetime-perl --yes
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
@@ -48,6 +48,12 @@ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
 echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
+
+# Disk monitoring
+cd /srv/
+curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
+unzip CloudWatchMonitoringScripts-1.2.1.zip
+rm CloudWatchMonitoringScripts-1.2.1.zip
 
 # Datadog
 #DD_API_KEY=xxxxxyyyyzzzzz bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
@@ -107,6 +113,12 @@ $ mongo
 > rs.add("mongo1.flyfisheurope.com:27017")
 > rs.add("mongo2.flyfisheurope.com:27017",true)
 > rs.config()
+
+4.4 Set priority on one master:
+$ mongo
+> cfg = rs.conf();
+> cfg.members[1].priority = 2;
+> rs.reconfig(cfg);
 
 5. On replica
 $ mongo
@@ -263,7 +275,11 @@ sudo timedatectl set-ntp on
 # Cron - from the repo
 read -r -d '' ROOT_CRONTAB_LINES <<- EOM
 # Cleanup old backups.
-0 4 * * *   /usr/bin/find /var/backups/mongodb/ -type f -mtime +30 | xargs rm
+0 4 * * *   /usr/bin/find /var/backups/mongodb/ -type f -mtime +15 | xargs rm
+
+# Send disk warnings
+*/5 * * * * /srv/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used-incl-cache-buff --mem-used --mem-avail --disk-space-util --disk-path / --disk-space-used --disk-space-avail
+
 EOM
 (crontab -l; echo "$ROOT_CRONTAB_LINES" ) | crontab -u root -
 
