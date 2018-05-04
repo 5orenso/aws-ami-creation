@@ -42,7 +42,7 @@ cat > /etc/telegraf/telegraf.conf <<'EOF'
 
 # Configuration for influxdb server to send metrics to
 [[outputs.influxdb]]
-  urls = ["http://172.30.1.231:8086"] # required
+  urls = ["http://172.30.1.31:8086"] # required
   database = "telegraf" # required
   retention_policy = ""
   write_consistency = "any"
