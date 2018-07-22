@@ -104,6 +104,46 @@ __Get started with an AWS Account:__
 * [Install the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
 * [Configure the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
 
+
+## AWS Prerequisite
+
+Sign up for EC2 on the web by visiting: https://eu-west-1.console.aws.amazon.com/console/signup?region=eu-west-1
+
+
+### Add your security credentials to your credentials file
+```
+$ emacs ~/.aws/credentials
+[myProfile]
+aws_access_key_id = ****************778
+aws_secret_access_key = ****************ndfjK
+```
+
+
+### Configure AWS CLI Account
+```
+$ aws configure --profile myProfile
+AWS Access Key ID [****************778]:
+AWS Secret Access Key [****************ndfjK]:
+Default region name [None]: eu-west-1
+Default output format [None]:
+```
+
+
+### Create key pair for EC2 login
+```
+aws ec2 create-key-pair --profile myProfile --key-name myProfile-ec2-default --output text > ~/.ssh/myProfile-ec2-default.pem
+
+emacs ~/.ssh/myProfile-ec2-default.pem
+# Remove all outside:
+-----BEGIN RSA PRIVATE KEY-----
+...
+-----END RSA PRIVATE KEY-----
+
+# Make key inaccessible:
+chmod 400 ~/.ssh/myProfile-ec2-default.pem
+```
+
+
 __Clone repo:__
 ```bash
 $ git clone https://github.com/5orenso/aws-ami-creation.git
@@ -113,4 +153,3 @@ $ cd aws-ami-creation
 That's all!
 
 If you create any useful server AMIs please [make a pull request](https://help.github.com/articles/creating-a-pull-request/).
-
