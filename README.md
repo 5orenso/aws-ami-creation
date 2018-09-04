@@ -54,6 +54,7 @@ __Options:__
 __Example:__
 ```bash
 $ bash ./create-ami.sh \
+    -p myAccountProfile \
     -u ami-templates/ami-template-node.sh \
     -k my-key-pair \
     -i role-ami-creator
