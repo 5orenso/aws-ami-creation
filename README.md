@@ -154,3 +154,12 @@ $ cd aws-ami-creation
 That's all!
 
 If you create any useful server AMIs please [make a pull request](https://help.github.com/articles/creating-a-pull-request/).
+
+
+## Other Resources
+
+* [AWS Basic setup with Cloudformation](https://github.com/5orenso/aws-cloudformation-base)
+* [AWS Lambda boilerplate](https://github.com/5orenso/aws-lambda-boilerplate)
+* [Automated AWS Lambda update](https://github.com/5orenso/aws-lambda-autodeploy-lambda)
+* [AWS API Gateway setup with Cloudformation](https://github.com/5orenso/aws-cloudformation-api-gateway)
+* [AWS IoT setup with Cloudformation](https://github.com/5orenso/aws-cloudformation-iot)
