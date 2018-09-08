@@ -159,6 +159,7 @@ If you create any useful server AMIs please [make a pull request](https://help.g
 ## Other Resources
 
 * [AWS Basic setup with Cloudformation](https://github.com/5orenso/aws-cloudformation-base)
+* [AWS Server setup with Cloudformation](https://github.com/5orenso/aws-cloudformation-servers)
 * [AWS Lambda boilerplate](https://github.com/5orenso/aws-lambda-boilerplate)
 * [Automated AWS Lambda update](https://github.com/5orenso/aws-lambda-autodeploy-lambda)
 * [AWS API Gateway setup with Cloudformation](https://github.com/5orenso/aws-cloudformation-api-gateway)
