@@ -44,10 +44,13 @@ apt-get install jq awscli git make g++ htop itop dstat unzip libwww-perl libdate
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
 
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
-echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+
+# Install MongoDB server: https://docs.mongodb.com/v3.6/tutorial/install-mongodb-on-ubuntu/
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
+echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.6 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
+
 
 # Disk monitoring
 cd /srv/
@@ -78,14 +81,14 @@ cat > /home/ubuntu/README.txt <<'EOF'
 ## Some instructions on how this is setup
 
 A. Choose your lates AMI and launch a new instance:
-       mongo0.flyfisheurope.com    eu-west-1c
-       mongo1.flyfisheurope.com    eu-west-1b
-       mongo2.flyfisheurope.com    eu-west-1a
+       mongo10.flyfisheurope.com   eu-west-1c / voter
+       mongo11.flyfisheurope.com   eu-west-1a / primary
+       mongo12.flyfisheurope.com   eu-west-1b / secondary
 
 Attach network interface when launcing instance:
-       mongo0.flyfisheurope.com    mongodb-replicaset-0    eni-e9dca791
-       mongo1.flyfisheurope.com    mongodb-replicaset-1    eni-5e821d02
-       mongo2.flyfisheurope.com    mongodb-replicaset-2    eni-98fc10d5
+       mongo10.flyfisheurope.com   mongodb-replicaset-0    eni-02a7ed9d9dcf06cd7
+       mongo11.flyfisheurope.com   mongodb-replicaset-1    eni-04d4219b0bb91d681
+       mongo12.flyfisheurope.com   mongodb-replicaset-2    eni-08472cb508c85528b
 
 --------------------------------------------------------------------------------
 
@@ -96,7 +99,7 @@ $ sudo vim /etc/hosts
 $ sudo vim /etc/hostname
 
 3. Set hostname with:
-$ sudo hostname mongo0.flyfisheurope.com
+$ sudo hostname mongo11.flyfisheurope.com
 
 4. On primary
 4.1 Initiate ReplicaSet with only one member
@@ -110,8 +113,9 @@ $ sudo mongorestore -d flyfish --drop ./flyfish/
 
 4.3 Add more replicas to this replicaset:
 $ mongo
-> rs.add("mongo1.flyfisheurope.com:27017")
-> rs.add("mongo2.flyfisheurope.com:27017",true)
+> rs.add("mongo10.flyfisheurope.com:27017", true)
+> rs.add("mongo11.flyfisheurope.com:27017")
+> rs.add("mongo12.flyfisheurope.com:27017")
 > rs.config()
 
 4.4 Set priority on one master:
@@ -120,9 +124,12 @@ $ mongo
 > cfg.members[1].priority = 2;
 > rs.reconfig(cfg);
 
-5. On replica
+5. On replicas
 $ mongo
 > db.setSlaveOk()
+
+6. Disable mongo-scripts in /etc/cron.daily/mongodb-scripts
+
 
 
 EOF
@@ -131,15 +138,18 @@ EOF
 # Default setup of replica sets.
 cat > /etc/hosts <<'EOF'
 # MongoDB setup.
-127.0.0.1           localhost mongo0.flyfisheurope.com
+127.0.0.1           localhost mongo11.flyfisheurope.com
 172.30.2.250        mongo0.flyfisheurope.com
 172.30.1.250        mongo1.flyfisheurope.com
 172.30.0.250        mongo2.flyfisheurope.com
+172.30.2.200        mongo10.flyfisheurope.com
+172.30.0.201        mongo11.flyfisheurope.com
+172.30.1.201        mongo12.flyfisheurope.com
 EOF
 
-hostname mongo0.flyfisheurope.com
+hostname mongo11.flyfisheurope.com
 cat > /etc/hostname <<'EOF'
-mongo0.flyfisheurope.com
+mongo11.flyfisheurope.com
 EOF
 
 
@@ -176,8 +186,8 @@ net:
 
 #replication:
 replication:
-   oplogSizeMB: 1
-   replSetName: rs0
+   oplogSizeMB: 1000
+   replSetName: rs4
 
 #sharding:
 
@@ -233,7 +243,7 @@ done
 EOF
 chmod 755 /etc/cron.daily/mongodb-scripts
 
-# Turn of defrag option to speed up file system.
+# Turn off defrag option to speed up file system.
 cat > /etc/init.d/disable-transparent-hugepages <<'EOF'
 #!/bin/sh
 ### BEGIN INIT INFO
@@ -272,17 +282,20 @@ sudo update-rc.d disable-transparent-hugepages defaults
 sudo timedatectl set-timezone Europe/Oslo
 sudo timedatectl set-ntp on
 
-# Cron - from the repo
-read -r -d '' ROOT_CRONTAB_LINES <<- EOM
+# Crontab for root
+cat > /tmp/crontab.root <<'EOF'
 # Cleanup old backups.
 0 4 * * *   /usr/bin/find /var/backups/mongodb/ -type f -mtime +15 | xargs rm
 
 # Send disk warnings
 */5 * * * * /srv/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used-incl-cache-buff --mem-used --mem-avail --disk-space-util --disk-path / --disk-space-used --disk-space-avail
 
-EOM
-(crontab -l; echo "$ROOT_CRONTAB_LINES" ) | crontab -u root -
+EOF
+echo "Adding to crontab for root from file /tmp/crontab.root"
+crontab /tmp/crontab.root
 
 # Create new image
 IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
+echo "Instance-id: ${EC2_INSTANCE_ID}"
+echo "New image name: ${IMAGE_NAME}"
 aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1

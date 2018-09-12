@@ -96,8 +96,8 @@ $ brew install jq
 ```
 
 _If you have Node.js and npm:_
-```
-$bash npm install -g msee
+```bash
+$ npm install -g msee
 ```
 
 __Get started with an AWS Account:__
@@ -112,7 +112,7 @@ Sign up for EC2 on the web by visiting: https://eu-west-1.console.aws.amazon.com
 
 
 ### Add your security credentials to your credentials file
-```
+```bash
 $ emacs ~/.aws/credentials
 [myProfile]
 aws_access_key_id = ****************778
@@ -121,7 +121,7 @@ aws_secret_access_key = ****************ndfjK
 
 
 ### Configure AWS CLI Account
-```
+```bash
 $ aws configure --profile myProfile
 AWS Access Key ID [****************778]:
 AWS Secret Access Key [****************ndfjK]:
@@ -131,17 +131,18 @@ Default output format [None]:
 
 
 ### Create key pair for EC2 login
-```
-aws ec2 create-key-pair --profile myProfile --key-name myProfile-ec2-default --output text > ~/.ssh/myProfile-ec2-default.pem
+```bash
+$ aws ec2 create-key-pair --profile myProfile --key-name myProfile-ec2-default --output text > ~/.ssh/myProfile-ec2-default.pem
 
-emacs ~/.ssh/myProfile-ec2-default.pem
+$ emacs ~/.ssh/myProfile-ec2-default.pem
 # Remove all outside:
 -----BEGIN RSA PRIVATE KEY-----
 ...
 -----END RSA PRIVATE KEY-----
+EOF
 
 # Make key inaccessible:
-chmod 400 ~/.ssh/myProfile-ec2-default.pem
+$ chmod 400 ~/.ssh/myProfile-ec2-default.pem
 ```
 
 
@@ -149,6 +150,22 @@ __Clone repo:__
 ```bash
 $ git clone https://github.com/5orenso/aws-ami-creation.git
 $ cd aws-ami-creation
+```
+
+
+### Debugging a failed image
+```bash
+# Log in to your build server
+local$ ssh -i ~/.ssh/myProfile-ec2-default.pem ubuntu@<public IP of your build server>
+
+# Take a look at the log file:
+$ less /var/log/cloud-init-output.log
+
+# Try to run the build file:
+$ sudo /var/lib/cloud/instance/scripts/part-001
+
+# Tweek the build file to make it work (remember to edit your local file 'ami-template-xxx' according to your changes):
+$ sudo vim /var/lib/cloud/instance/scripts/part-001
 ```
 
 That's all!
