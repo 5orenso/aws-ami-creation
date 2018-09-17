@@ -91,24 +91,41 @@ Attach network interface when launcing instance:
        mongo12.flyfisheurope.com   mongodb-replicaset-2    eni-08472cb508c85528b
 
 --------------------------------------------------------------------------------
-
+All servers:
+--------------------------------------------------------------------------------
 1. Edit /etc/hosts and set 127.0.0.1 to the correct hostname:
 $ sudo vim /etc/hosts
+127.0.0.1           localhost mongo11.flyfisheurope.com
 
-2. Edit /etc/hostname and set the correct hostname:
+1.2 Edit /etc/hostname and set the correct hostname:
 $ sudo vim /etc/hostname
+mongo11.flyfisheurope.com
 
-3. Set hostname with:
+2. Set hostname with:
 $ sudo hostname mongo11.flyfisheurope.com
 
-4. On primary
+3. Edit mongod bindIp
+$ sudo vim /etc/mongod.conf
+net:
+  bindIp: 172.30.0.201,127.0.0.1
+
+3.1 Stop server
+$ sudo service mongod stop
+
+3.2 Start server again
+$ sudo service mongod start
+
+
+--------------------------------------------------------------------------------
+4. On PRIMARY
+--------------------------------------------------------------------------------
 4.1 Initiate ReplicaSet with only one member
 $ mongo
 > rs.initiate()
 
 4.2 Fetch backups and restore
 $ mkdir flyfish
-$ aws s3 sync s3://ffe-mongodb-backups/ip-10-39-40-33/2016/06/25/flyfish/ ./flyfish/ --region eu-west-1
+$ aws s3 sync s3://ffe-mongodb-backups/mongo1.flyfisheurope.com/2018/09/12/flyfish/ ./flyfish/ --region eu-west-1
 $ sudo mongorestore -d flyfish --drop ./flyfish/
 
 4.3 Add more replicas to this replicaset:
@@ -121,16 +138,30 @@ $ mongo
 4.4 Set priority on one master:
 $ mongo
 > cfg = rs.conf();
-> cfg.members[1].priority = 2;
+> cfg.members[0].priority = 10;
 > rs.reconfig(cfg);
 
-5. On replicas
+
+--------------------------------------------------------------------------------
+5. On SECONDARY
+--------------------------------------------------------------------------------
 $ mongo
 > db.setSlaveOk()
 
 6. Disable mongo-scripts in /etc/cron.daily/mongodb-scripts
+$ sudo rm /etc/cron.daily/mongodb-scripts
+
+7. Check log for replication primary and secondaries.
+$ tail -f /var/log/mongodb/mongod.log
+
+8. To run commands on secondaries
+rs4:SECONDARY> rs.slaveOk()
+rs4:SECONDARY> show dbs
+rs4:SECONDARY> use flyfish
+rs4:SECONDARY> show collections
 
 
+That's all folks!
 
 EOF
 
@@ -175,7 +206,7 @@ systemLog:
 
 # network interfaces
 net:
-  #bindIp: 127.0.0.1 - Important to comment this line
+  bindIp: 172.30.0.201,127.0.0.1
   port: 27017
 
 #processManagement:
@@ -187,7 +218,7 @@ net:
 #replication:
 replication:
    oplogSizeMB: 1000
-   replSetName: rs4
+   replSetName: rs36
 
 #sharding:
 
