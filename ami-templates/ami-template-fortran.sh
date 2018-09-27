@@ -68,7 +68,7 @@ cat > /tmp/awslogs.conf <<'EOF'
 [general]
 state_file = /var/awslogs/state/agent-state
 EOF
-python ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
+python3 ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
 
 # Set timedatectl
 sudo timedatectl set-timezone Europe/Oslo

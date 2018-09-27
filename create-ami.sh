@@ -136,9 +136,9 @@ fi
 # Default values
 AWS_REGION=${AWS_REGION:-'eu-west-1'}
 # This is the Ubuntu base image provided by AWS. No changes needed unless you want another version.
-BASE_IMAGE=${BASE_IMAGE:-'ami-6f587e1c'}
+BASE_IMAGE=${BASE_IMAGE:-'ami-0181f8d9b6f098ec4'} # Ubuntu Server 16.04 LTS (HVM), SSD Volume Type - ami-0181f8d9b6f098ec4
 # Instance type. Default is fine.
-INSTANCE_TYPE=${INSTANCE_TYPE:-'m3.medium'}
+INSTANCE_TYPE=${INSTANCE_TYPE:-'m4.large'}
 
 # Optional value
 if [ ! -z "$SUBNET" ]; then
@@ -208,7 +208,7 @@ echo "------------------------------"
 # Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - ami-47a23a30
 EC2_RUN_OUTPUT=$(aws ec2 run-instances $AWS_PROFILE \
     --region $AWS_REGION \
-    --image-id ami-47a23a30 \
+    --image-id $BASE_IMAGE \
     --count 1 \
     --key-name $KEY_PAIR \
     --user-data file://$USER_DATA_FILE \

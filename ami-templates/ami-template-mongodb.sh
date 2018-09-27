@@ -61,13 +61,14 @@ rm CloudWatchMonitoringScripts-1.2.1.zip
 # Datadog
 #DD_API_KEY=xxxxxyyyyzzzzz bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
 
+
 # Cloudwatch logs
-#curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-#cat > /tmp/awslogs.conf <<'EOF'
-#[general]
-#state_file = /var/awslogs/state/agent-state
-#EOF
-#python ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
+curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+cat > /tmp/awslogs.conf <<'EOF'
+[general]
+state_file = /var/awslogs/state/agent-state
+EOF
+python3 ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
 
 
 # noatime for Mongodb performance.
