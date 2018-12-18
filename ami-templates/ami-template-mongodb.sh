@@ -151,6 +151,7 @@ $ mongo
 
 6. Disable mongo-scripts in /etc/cron.daily/mongodb-scripts
 $ sudo rm /etc/cron.daily/mongodb-scripts
+$ sudo rm /etc/cron.hourly/mongodb-scripts
 
 7. Check log for replication primary and secondaries.
 $ tail -f /var/log/mongodb/mongod.log
@@ -274,6 +275,24 @@ done
 
 EOF
 chmod 755 /etc/cron.daily/mongodb-scripts
+
+# MongoDB cron-hourly scripts
+mkdir /home/ubuntu/mongodb-cron-hourly/
+chmod 755 /home/ubuntu/mongodb-cron-hourly/
+
+cat > /etc/cron.hourly/mongodb-scripts <<'EOF'
+#!/bin/bash
+
+SCRIPTS=/home/ubuntu/mongodb-cron-hourly/
+
+/usr/bin/aws --region eu-west-1 s3 sync s3://ffe-mongodb-cron-hourly/ $SCRIPTS
+
+for i in `find $SCRIPTS -name '*.js'` ; do
+    /usr/bin/mongo flyfish $i;
+done
+
+EOF
+chmod 755 /etc/cron.hourly/mongodb-scripts
 
 # Turn off defrag option to speed up file system.
 cat > /etc/init.d/disable-transparent-hugepages <<'EOF'

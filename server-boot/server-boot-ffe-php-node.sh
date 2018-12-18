@@ -24,6 +24,9 @@ cat >> /etc/hosts <<'EOF'
 172.30.2.250        mongo0.flyfisheurope.com
 172.30.1.250        mongo1.flyfisheurope.com
 172.30.0.250        mongo2.flyfisheurope.com
+172.30.2.200        mongo10.flyfisheurope.com
+172.30.0.201        mongo11.flyfisheurope.com
+172.30.1.201        mongo12.flyfisheurope.com
 EOF
 
 

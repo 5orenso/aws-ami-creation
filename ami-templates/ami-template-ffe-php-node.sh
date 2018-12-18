@@ -45,6 +45,7 @@ apt-get install postfix --yes
 
 apt-get install jq awscli mailutils git make g++ dstat ncftp fail2ban logwatch zip unzip imagemagick imagemagick-common apache2 libapache2-mod-php5 varnish --yes
 apt-get install php5 php5-curl php5-dev php5-cli php-pear php5-imagick php5-gd --yes
+apt-get install lftp --yes
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
