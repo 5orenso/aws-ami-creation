@@ -135,8 +135,10 @@ fi
 
 # Default values
 AWS_REGION=${AWS_REGION:-'eu-west-1'}
+
 # This is the Ubuntu base image provided by AWS. No changes needed unless you want another version.
-BASE_IMAGE=${BASE_IMAGE:-'ami-0181f8d9b6f098ec4'} # Ubuntu Server 16.04 LTS (HVM), SSD Volume Type - ami-0181f8d9b6f098ec4
+# Locate your base ami here: https://cloud-images.ubuntu.com/locator/ec2/
+BASE_IMAGE=${BASE_IMAGE:-'ami-0ae0cb89fc578cd9c'} # Ubuntu Server 18.04 LTS hvm:ebs-ssd
 # Instance type. Default is fine.
 INSTANCE_TYPE=${INSTANCE_TYPE:-'m4.large'}
 
@@ -187,6 +189,16 @@ ${ERROR_BULLET} Missing "${MISSING_KEYWORD}user data file${R}". Please set with:
 EOM
     ls ami-templates/*.sh | cat
     echo ""
+fi
+if [ -z "$SUBNET" ]; then
+    EXIT_MISSING=1
+    echo '* Missing "subnet-list". Please set with:'
+    echo '        -s|--subnet <subnet id>'
+    echo '    Example usage:'
+    echo '        -s subnet-xxxxxx1a'
+    echo '    Existing subnets:'
+    aws ec2 describe-subnets $AWS_PROFILE | jq -c '.Subnets[] | { id: .SubnetId, zone: .AvailabilityZone, vpc: .VpcId, ip: .CidrBlock, publicIP: .MapPublicIpOnLaunch, default: .DefaultForAz }'
+    echo ''
 fi
 if [ ! -z "$EXIT_MISSING" ]; then
     echo ""

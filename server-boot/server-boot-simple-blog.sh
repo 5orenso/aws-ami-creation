@@ -9,6 +9,15 @@ ELASTIC_IP=52.17.86.89
 INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
 aws ec2 associate-address --instance-id $INSTANCE_ID --public-ip $ELASTIC_IP --allow-reassociation
 
+# ----------------------------------------------------------------
+# Update hostfile
+cat >> /etc/hosts <<'EOF'
+# MongoDB setup.
+172.30.2.200        mongo10.flyfisheurope.com
+172.30.0.201        mongo11.flyfisheurope.com
+172.30.1.201        mongo12.flyfisheurope.com
+EOF
+
 mkdir /root/.node-gyp/
 
 # ----------------------------------------------------------------
@@ -92,42 +101,16 @@ EOF
 while IFS= read -r domain; do
   echo "$domain"
 # Startup script
-cat > /etc/init/simple-blog-${domain}.conf <<EOF
-# ----------------------------------------------------------------------
-# simple-blog - instance
-#
-description     "simple-blog-${domain}"
+cat > /etc/systemd/system/simple-blog-${domain}.service <<EOF
+[Unit]
+Description=simple-blog-${domain}
 
-start on (virtual-filesystems and net-device-up IFACE=eth0)
-stop on runlevel [06]
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/config-${domain}.js  >> /var/log/simple-blog/simple-blog-${domain}.log 2>&1
+StandardOutput=null
+Restart=on-failure
 
-respawn
-respawn limit 10 5    # Die if respawn more than 10 times in 5 sec.
-
-chdir /srv/simple-blog
-setuid ubuntu
-setgid ubuntu
-console log
-
-script
-    echo $$ > /var/run/simple-blog/simple-blog-${domain}.pid
-    exec /usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/config-${domain}.js  >> /var/log/simple-blog/simple-blog-${domain}.log 2>&1
-end script
-
-pre-start script
-    # Date format same as (new Date()).toISOString() for consistency
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> /var/log/simple-blog/simple-blog-${domain}.log
-end script
-
-pre-stop script
-    rm /var/run/simple-blog/simple-blog-${domain}.pid
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> /var/log/simple-blog/simple-blog-${domain}.log
-end script
-
-#-----[ HOWTO ]--------------------------------------------------
-# sudo cp upstart.conf /etc/init/simple-blog.conf
-# sudo initctl start simple-blog-${domain}
-# sudo tail -f /var/log/simple-blog/simple-blog-${domain}.log
 EOF
 
 # Run the application:
