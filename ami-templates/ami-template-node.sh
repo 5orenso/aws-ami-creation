@@ -39,7 +39,11 @@ EC2_INSTANCE_ID=`get_ec2_instance_id`
 apt-get update
 
 # AWS tools and other software
-apt-get install jq awscli git make g++ --yes
+apt-get install jq awscli git make g++ \
+build-essential checkinstall \
+libreadline-gplv2-dev libncursesw5-dev libssl-dev \
+libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
+--yes
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
@@ -59,13 +63,23 @@ cd /tmp/
 wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
 dpkg -i telegraf_1.2.1_amd64.deb
 
+# Python 3.5 for the Cloudwatch script
+cd /usr/src/
+sudo wget https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz
+sudo tar xzf Python-3.5.2.tgz
+cd /usr/src/Python-3.5.2
+sudo ./configure
+sudo make altinstall
+sudo ln -s /usr/src/Python-3.5.2/python /usr/bin/python
+
 # Cloudwatch logs
+cd /tmp/
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 cat > /tmp/awslogs.conf <<'EOF'
 [general]
 state_file = /var/awslogs/state/agent-state
 EOF
-python3 ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
+python ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
 
 # Set timedatectl
 sudo timedatectl set-timezone Europe/Oslo
