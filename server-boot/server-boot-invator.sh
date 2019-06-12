@@ -130,6 +130,8 @@ npm install --production
 
 # Logging folders
 mkdir /var/log/node-ffe-web/
+cat > /var/log/node-ffe-web/node-ffe-web.log <<EOF
+EOF
 chown -R ubuntu:ubuntu /var/log/node-ffe-web/
 chmod u+w /var/log/node-ffe-web/
 
