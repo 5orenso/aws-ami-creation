@@ -121,8 +121,10 @@ service telegraf start
 mkdir /srv/
 cd /srv/
 git clone $GIT_REPO_CONFIG
-git clone $GIT_REPO_ZU_CMS
 git clone $GIT_REPO_NODE_FFE_CMS
+
+# Get the public key for Amazon DocumentDB
+wget https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem
 
 # Install all packages
 cd /srv/node-ffe-web/
