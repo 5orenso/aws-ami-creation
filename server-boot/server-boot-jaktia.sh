@@ -161,7 +161,8 @@ Description=pck-soap-api
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/node /srv/pck-soap-api/app/server.js -c /srv/config/pck-soap-api/config.js  >> /var/log/pck-soap-api/pck-soap-api.log 2>&1
+WorkingDirectory=/srv/pck-soap-api
+ExecStart=/usr/local/bin/node /srv/pck-soap-api/index.js -c /srv/config/pck-soap-api/config.js  >> /var/log/pck-soap-api/pck-soap-api.log 2>&1
 StandardOutput=null
 Restart=on-failure
 EOF
