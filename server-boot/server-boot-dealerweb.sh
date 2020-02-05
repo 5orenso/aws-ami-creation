@@ -121,30 +121,20 @@ service telegraf start
 mkdir /srv/
 cd /srv/
 git clone $GIT_REPO_CONFIG
-git clone $GIT_REPO_ZU_CMS
 git clone $GIT_REPO_NODE_FFE_CMS
 
 # Install all packages
-cd /srv/Zu-CMS/
-npm install --production
-
 cd /srv/node-ffe-web/
 npm install --production
 
-# Logging folders
-mkdir /var/log/Zu-CMS/
-chown -R ubuntu:ubuntu /var/log/Zu-CMS/
-chmod u+w /var/log/Zu-CMS/
+export GOOGLE_APPLICATION_CREDENTIALS=/srv/config/node-ffe-web/ffe-dealerweb-c587eaa3f46b.json
 
+# Logging folders
 mkdir /var/log/node-ffe-web/
 chown -R ubuntu:ubuntu /var/log/node-ffe-web/
 chmod u+w /var/log/node-ffe-web/
 
 # Pid file
-mkdir /var/run/Zu-CMS/
-chown -R ubuntu:ubuntu /var/run/Zu-CMS/
-chmod u+w /var/run/Zu-CMS/
-
 mkdir /var/run/node-ffe-web/
 chown -R ubuntu:ubuntu /var/run/node-ffe-web/
 chmod u+w /var/run/node-ffe-web/
