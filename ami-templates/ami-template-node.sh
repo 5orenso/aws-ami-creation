@@ -33,7 +33,8 @@ get_ec2_instance_id() {
     echo `curl http://169.254.169.254/latest/meta-data/instance-id`
 }
 
-DEBIAN_FRONTEND=noninteractive
+export UCF_FORCE_CONFOLD=1
+export DEBIAN_FRONTEND=noninteractive
 EC2_INSTANCE_ID=`get_ec2_instance_id`
 
 apt-get update
@@ -48,8 +49,10 @@ libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
-NODE_VERSION="8.11.4"
+sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+
+NODE_VERSION="12.14.1"
+
 sudo curl -o /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
 cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
 sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
@@ -62,24 +65,6 @@ sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
 cd /tmp/
 wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
 dpkg -i telegraf_1.2.1_amd64.deb
-
-# Python 3.5 for the Cloudwatch script
-cd /usr/src/
-sudo wget https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz
-sudo tar xzf Python-3.5.2.tgz
-cd /usr/src/Python-3.5.2
-sudo ./configure
-sudo make altinstall
-sudo ln -s /usr/src/Python-3.5.2/python /usr/bin/python
-
-# Cloudwatch logs
-cd /tmp/
-curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-cat > /tmp/awslogs.conf <<'EOF'
-[general]
-state_file = /var/awslogs/state/agent-state
-EOF
-python ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
 
 # Set timedatectl
 sudo timedatectl set-timezone Europe/Oslo

@@ -158,6 +158,7 @@ Manual steps:
 
 * Include blog folders
     $ dropbox.py exclude remove websites
+    $ dropbox.py exclude remove websites 'BLOG (2)'
 
 * When everything is up to date:
     $ dropbox.py status

@@ -239,7 +239,7 @@ DATE=`/bin/date '+%Y/%m/%d'`
 DIR=/var/backups/mongodb/$HOSTNAME
 
 MONGODUMP=/usr/bin/mongodump
-PARAM=" -o "
+PARAM="--gzip -o "
 
 /bin/mkdir -p $DIR/$DATE
 
