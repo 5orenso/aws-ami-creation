@@ -51,7 +51,7 @@ aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creat
 
 sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 
-NODE_VERSION="12.14.1"
+NODE_VERSION="12.18.1"
 
 sudo curl -o /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
 cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
@@ -69,6 +69,9 @@ dpkg -i telegraf_1.2.1_amd64.deb
 # Set timedatectl
 sudo timedatectl set-timezone Europe/Oslo
 sudo timedatectl set-ntp on
+
+# Disable CPU thief unattended-upgr
+sudo cp  /usr/share/unattended-upgrades/20auto-upgrades-disabled  /etc/apt/apt.conf.d/
 
 IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1
