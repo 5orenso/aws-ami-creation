@@ -134,5 +134,42 @@ EOF
 done < "/srv/config/simple-blog/active-domains.txt"
 # ---[ /ALL active domains ]--------------------------------------------------
 
+cat > /etc/systemd/system/eagleeyeai.litt.no.service <<EOF
+[Unit]
+Description=eagleeyeai.litt.no
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /srv/eagle-eye-ai/app/server.js -c /srv/eagle-eye-ai/config/config.js >> /var/log/simple-blog/eagleeyeai.litt.no.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+cat > /etc/systemd/system/themusher.litt.no.service <<EOF
+[Unit]
+Description=themusher.litt.no
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /srv/musher/app/server.js -c /srv/musher/config/config.js >> /var/log/simple-blog/themusher.litt.no.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+cat > /etc/systemd/system/wifetoperator.litt.no.service <<EOF
+[Unit]
+Description=wifetoperator.litt.no
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /srv/wifet-operator-api/app/server.js -c /srv/wifet-operator-api/config/config.js >> /var/log/simple-blog/wifetoperator.litt.no.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+
 chmod 755 /etc/cron.hourly/simple-blog-sitemap.sh
 service awslogs restart
