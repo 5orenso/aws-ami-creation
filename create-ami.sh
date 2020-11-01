@@ -138,7 +138,7 @@ AWS_REGION=${AWS_REGION:-'eu-west-1'}
 
 # This is the Ubuntu base image provided by AWS. No changes needed unless you want another version.
 # Locate your base ami here: https://cloud-images.ubuntu.com/locator/ec2/
-BASE_IMAGE=${BASE_IMAGE:-'ami-0ae0cb89fc578cd9c'} # Ubuntu Server 18.04 LTS hvm:ebs-ssd
+BASE_IMAGE=${BASE_IMAGE:-'ami-06fd8a495a537da8b'} # Ubuntu Server 20.04 LTS hvm:ebs-ssd
 # Instance type. Default is fine.
 INSTANCE_TYPE=${INSTANCE_TYPE:-'m4.large'}
 

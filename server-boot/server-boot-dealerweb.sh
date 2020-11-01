@@ -12,6 +12,11 @@ cat >> /etc/hosts <<'EOF'
 172.30.2.200        mongo10.flyfisheurope.com
 172.30.0.201        mongo11.flyfisheurope.com
 172.30.1.201        mongo12.flyfisheurope.com
+
+172.30.2.220        mongo20.flyfisheurope.com
+172.30.0.221        mongo21.flyfisheurope.com
+172.30.1.222        mongo22.flyfisheurope.com
+172.30.2.223        mongo23.flyfisheurope.com
 EOF
 
 # Fix telegraph config

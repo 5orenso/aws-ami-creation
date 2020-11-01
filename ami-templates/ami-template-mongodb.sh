@@ -45,70 +45,86 @@ apt-get install jq awscli git make g++ htop itop dstat unzip libwww-perl libdate
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
 
 
-# Install MongoDB server: https://docs.mongodb.com/v3.6/tutorial/install-mongodb-on-ubuntu/
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
-echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.6 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
+# Install MongoDB server: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+sudo apt-get install gnupg
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 
 
 # Disk monitoring
 cd /srv/
-curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
-unzip CloudWatchMonitoringScripts-1.2.1.zip
-rm CloudWatchMonitoringScripts-1.2.1.zip
+curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.2.zip -O
+unzip CloudWatchMonitoringScripts-1.2.2.zip
+rm CloudWatchMonitoringScripts-1.2.2.zip
 
 # Datadog
 #DD_API_KEY=xxxxxyyyyzzzzz bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
 
 
-# Cloudwatch logs
-curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-cat > /tmp/awslogs.conf <<'EOF'
-[general]
-state_file = /var/awslogs/state/agent-state
-EOF
-python3 ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
+# # Cloudwatch logs
+# curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+# cat > /tmp/awslogs.conf <<'EOF'
+# [general]
+# state_file = /var/awslogs/state/agent-state
+# EOF
+# python3 ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
 
 
 # noatime for Mongodb performance.
 mv /etc/fstab /etc/fstab.old
 cat > /etc/fstab <<'EOF'
 LABEL=cloudimg-rootfs   /        ext4   defaults,noatime,discard        0 0
-/dev/xvdb               /mnt     auto   defaults,nobootwait,comment=cloudconfig 0       2
+/dev/nvme1n1            /data    auto   defaults,nobootwait,comment=mongodb 0       2
 EOF
 
 cat > /home/ubuntu/README.txt <<'EOF'
 ## Some instructions on how this is setup
 
 A. Choose your lates AMI and launch a new instance:
-       mongo10.flyfisheurope.com   eu-west-1c / voter
-       mongo11.flyfisheurope.com   eu-west-1a / primary
-       mongo12.flyfisheurope.com   eu-west-1b / secondary
+       mongo20.flyfisheurope.com   eu-west-1c / voter
+       mongo21.flyfisheurope.com   eu-west-1a / primary
+       mongo22.flyfisheurope.com   eu-west-1b / secondary
+       mongo23.flyfisheurope.com   eu-west-1c / secondary
 
 Attach network interface when launcing instance:
-       mongo10.flyfisheurope.com   mongodb-replicaset-0    eni-02a7ed9d9dcf06cd7
-       mongo11.flyfisheurope.com   mongodb-replicaset-1    eni-04d4219b0bb91d681
-       mongo12.flyfisheurope.com   mongodb-replicaset-2    eni-08472cb508c85528b
+       mongo20.flyfisheurope.com   mongodb-replicaset-20    eni-069994e8ac6820f7d
+       mongo21.flyfisheurope.com   mongodb-replicaset-21    eni-060679a827ac848d6
+       mongo22.flyfisheurope.com   mongodb-replicaset-22    eni-0223aa9dbdc7a53f4
+       mongo23.flyfisheurope.com   mongodb-replicaset-23    eni-0d62fa4f8cca319f1
+
+Attach ebs disks when launching instance:
+       mongo21.flyfisheurope.com   mongodb-replicaset-21    vol-0cd67d48705f6f157
+       mongo22.flyfisheurope.com   mongodb-replicaset-22    vol-069fcace08919a6cb
+       mongo23.flyfisheurope.com   mongodb-replicaset-23    vol-0ed7d6cac8c5ecdee
+
+First time you should format the file systems:
+$ sudo fdisk -l
+$ sudo mkfs.xfs /dev/xvdf
+$ mkdir /data
+$ mount /dev/xvdf /var/lib/mongodb
+$ df -T
+
 
 --------------------------------------------------------------------------------
 All servers:
 --------------------------------------------------------------------------------
 1. Edit /etc/hosts and set 127.0.0.1 to the correct hostname:
 $ sudo vim /etc/hosts
-127.0.0.1           localhost mongo11.flyfisheurope.com
+127.0.0.1           localhost mongo21.flyfisheurope.com
 
 1.2 Edit /etc/hostname and set the correct hostname:
 $ sudo vim /etc/hostname
-mongo11.flyfisheurope.com
+mongo21.flyfisheurope.com
 
 2. Set hostname with:
-$ sudo hostname mongo11.flyfisheurope.com
+$ sudo hostname mongo21.flyfisheurope.com
 
 3. Edit mongod bindIp
 $ sudo vim /etc/mongod.conf
 net:
-  bindIp: 172.30.0.201,127.0.0.1
+  bindIp: 172.30.0.221,127.0.0.1
 
 3.1 Stop server
 $ sudo service mongod stop
@@ -125,15 +141,16 @@ $ mongo
 > rs.initiate()
 
 4.2 Fetch backups and restore
-$ mkdir flyfish
-$ aws s3 sync s3://ffe-mongodb-backups/mongo1.flyfisheurope.com/2018/09/12/flyfish/ ./flyfish/ --region eu-west-1
-$ sudo mongorestore -d flyfish --drop ./flyfish/
+$ mkdir mongodb-backup
+$ aws s3 sync s3://ffe-mongodb-backups/mongo12.flyfisheurope.com/2020/11/01/ ./mongodb-backup/ --region eu-west-1
+$ sudo mongorestore -d flyfish --drop ./mongodb-backup/flyfish/
 
 4.3 Add more replicas to this replicaset:
 $ mongo
-> rs.add("mongo10.flyfisheurope.com:27017", true)
-> rs.add("mongo11.flyfisheurope.com:27017")
-> rs.add("mongo12.flyfisheurope.com:27017")
+> rs.add("mongo20.flyfisheurope.com:27017", true)
+> rs.add("mongo21.flyfisheurope.com:27017")
+> rs.add("mongo22.flyfisheurope.com:27017")
+> rs.add("mongo23.flyfisheurope.com:27017")
 > rs.config()
 
 4.4 Set priority on one master:
@@ -157,10 +174,10 @@ $ sudo rm /etc/cron.hourly/mongodb-scripts
 $ tail -f /var/log/mongodb/mongod.log
 
 8. To run commands on secondaries
-rs4:SECONDARY> rs.slaveOk()
-rs4:SECONDARY> show dbs
-rs4:SECONDARY> use flyfish
-rs4:SECONDARY> show collections
+rs44:SECONDARY> rs.slaveOk()
+rs44:SECONDARY> show dbs
+rs44:SECONDARY> use flyfish
+rs44:SECONDARY> show collections
 
 
 That's all folks!
@@ -171,18 +188,22 @@ EOF
 # Default setup of replica sets.
 cat > /etc/hosts <<'EOF'
 # MongoDB setup.
-127.0.0.1           localhost mongo11.flyfisheurope.com
-172.30.2.250        mongo0.flyfisheurope.com
-172.30.1.250        mongo1.flyfisheurope.com
-172.30.0.250        mongo2.flyfisheurope.com
+127.0.0.1           localhost mongo21.flyfisheurope.com
+
 172.30.2.200        mongo10.flyfisheurope.com
 172.30.0.201        mongo11.flyfisheurope.com
 172.30.1.201        mongo12.flyfisheurope.com
+
+172.30.2.220        mongo20.flyfisheurope.com
+172.30.0.221        mongo21.flyfisheurope.com
+172.30.1.222        mongo22.flyfisheurope.com
+172.30.2.223        mongo23.flyfisheurope.com
+
 EOF
 
-hostname mongo11.flyfisheurope.com
+hostname mongo21.flyfisheurope.com
 cat > /etc/hostname <<'EOF'
-mongo11.flyfisheurope.com
+mongo21.flyfisheurope.com
 EOF
 
 
@@ -208,7 +229,7 @@ systemLog:
 
 # network interfaces
 net:
-  bindIp: 172.30.0.201,127.0.0.1
+  bindIp: 172.30.0.221,127.0.0.1
   port: 27017
 
 #processManagement:
@@ -220,7 +241,7 @@ net:
 #replication:
 replication:
    oplogSizeMB: 1000
-   replSetName: rs36
+   replSetName: rs44
 
 #sharding:
 
@@ -345,8 +366,13 @@ EOF
 echo "Adding to crontab for root from file /tmp/crontab.root"
 crontab /tmp/crontab.root
 
+# Enable ENA
+# sudo apt-get update && sudo apt-get upgrade -y linux-aws
+# aws ec2 modify-instance-attribute --instance-id instance_id --ena-support
+# aws ec2 modify-instance-attribute --region eu-west-1 --instance-id $EC2_INSTANCE_ID --ena-support
+
 # Create new image
 IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 echo "Instance-id: ${EC2_INSTANCE_ID}"
 echo "New image name: ${IMAGE_NAME}"
-aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1
+aws ec2 create-image --instance-id ${EC2_INSTANCE_ID} --name ${IMAGE_NAME} --region eu-west-1
