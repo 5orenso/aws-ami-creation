@@ -150,8 +150,12 @@ $ mongo
 > rs.add("mongo20.flyfisheurope.com:27017", true)
 > rs.add("mongo21.flyfisheurope.com:27017")
 > rs.add("mongo22.flyfisheurope.com:27017")
-> rs.add("mongo23.flyfisheurope.com:27017")
 > rs.config()
+
+> rs.remove("mongo21.flyfisheurope.com:27017")
+> rs.remove("mongo22.flyfisheurope.com:27017")
+> rs.remove("mongo23.flyfisheurope.com:27017")
+> rs.config({ force: true })
 
 4.4 Set priority on one master:
 $ mongo
@@ -164,7 +168,7 @@ $ mongo
 5. On SECONDARY
 --------------------------------------------------------------------------------
 $ mongo
-> db.setSlaveOk()
+> db.setSecondaryOk()
 
 6. Disable mongo-scripts in /etc/cron.daily/mongodb-scripts
 $ sudo rm /etc/cron.daily/mongodb-scripts
@@ -174,7 +178,7 @@ $ sudo rm /etc/cron.hourly/mongodb-scripts
 $ tail -f /var/log/mongodb/mongod.log
 
 8. To run commands on secondaries
-rs44:SECONDARY> rs.slaveOk()
+rs44:SECONDARY> rs.setSecondaryOk()
 rs44:SECONDARY> show dbs
 rs44:SECONDARY> use flyfish
 rs44:SECONDARY> show collections
@@ -242,6 +246,8 @@ net:
 replication:
    oplogSizeMB: 1000
    replSetName: rs44
+
+# replication.enableMajorityReadConcern: false
 
 #sharding:
 
