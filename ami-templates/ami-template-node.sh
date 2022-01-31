@@ -51,7 +51,7 @@ aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creat
 
 sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 
-NODE_VERSION="16.2.0"
+NODE_VERSION="16.13.2"
 
 sudo curl -o /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
 cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
