@@ -134,6 +134,11 @@ mkdir /var/log/simple-blog/
 chown -R ubuntu:ubuntu /var/log/simple-blog/
 chmod u+w /var/log/simple-blog/
 
+mkdir /srv/simple-blog/logs/
+chown -R ubuntu:ubuntu /srv/simple-blog/logs/
+chmod u+w /srv/simple-blog/logs/
+
+
 mkdir /var/log/musher/
 chown -R ubuntu:ubuntu /var/log/musher/
 chmod u+w /var/log/musher/
@@ -188,7 +193,7 @@ Description=themusher.app
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/musher/the-musher-100940e760c0.json"
-ExecStart=/usr/bin/node /srv/musher/app/server.js -c /srv/config/musher/config.js
+ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/config/musher/config.js
 
 StandardOutput=file:/var/log/musher/themusher.app.log
 StandardError=file:/var/log/musher/themusher.app.error
