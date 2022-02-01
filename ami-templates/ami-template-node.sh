@@ -44,6 +44,7 @@ apt-get install jq awscli git make g++ \
 build-essential checkinstall \
 libreadline-gplv2-dev libncursesw5-dev libssl-dev \
 libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
+libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm-dev libnss3-dev libxss-dev \
 --yes
 
 # Tag instance

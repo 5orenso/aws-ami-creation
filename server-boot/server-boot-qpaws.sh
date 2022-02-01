@@ -113,7 +113,6 @@ EOF
 service telegraf stop
 service telegraf start
 
-
 # ----------------------------------------------------------------
 # Get the application you want to run on this server:
 mkdir /srv/
