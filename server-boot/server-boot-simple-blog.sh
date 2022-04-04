@@ -133,9 +133,12 @@ git clone https://github.com/5orenso/simple-blog.git
 
 # Install all packages
 cd /srv/simple-blog/
-npm install --force
+npm install --production --force
 
 cd /srv/musher/
+npm install --production --force
+
+cd /srv/eagle-eye-ai/
 npm install --production --force
 
 # Logging folders
