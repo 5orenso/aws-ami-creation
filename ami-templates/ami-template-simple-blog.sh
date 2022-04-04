@@ -39,10 +39,25 @@ EC2_INSTANCE_ID=`get_ec2_instance_id`
 apt-get update
 
 # AWS tools and other software
-apt-get install jq awscli git make g++ imagemagick --yes
+apt-get install jq awscli git make g++ \
+build-essential checkinstall \
+libreadline-gplv2-dev libncursesw5-dev libssl-dev \
+libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
+libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm-dev libnss3-dev libxss-dev \
+--yes
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
+
+sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+
+NODE_VERSION="16.13.2"
+
+sudo curl -o /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
+cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
+sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
+sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
+
 
 cat > /etc/init.d/dropbox <<'EOF'
 #!/bin/sh
@@ -119,14 +134,21 @@ update-rc.d dropbox defaults
 # Control the Dropbox client like any other Ubuntu service
 # service dropbox start|stop|reload|force-reload|restart|status
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
-NODE_VERSION="8.6.0"
-sudo curl -o /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
-cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
-sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
-sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
+# Set timedatectl
+sudo timedatectl set-timezone Europe/Oslo
+sudo timedatectl set-ntp on
 
-IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
+
+# Telegraf
+cd /tmp/
+wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
+dpkg -i telegraf_1.2.1_amd64.deb
+
+# Disable CPU thief unattended-upgr
+sudo cp  /usr/share/unattended-upgrades/20auto-upgrades-disabled  /etc/apt/apt.conf.d/
+
+# IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
+# aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1
 
 cat <<EOF
 -------------------------------------------------------------------------------
@@ -172,6 +194,3 @@ Manual steps:
 
 EOF
 
-# Set timedatectl
-sudo timedatectl set-timezone Europe/Oslo
-sudo timedatectl set-ntp on
