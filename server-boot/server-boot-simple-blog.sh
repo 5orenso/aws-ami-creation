@@ -161,6 +161,9 @@ mkdir /var/run/musher/
 chown -R ubuntu:ubuntu /var/run/musher/
 chmod u+w /var/run/musher/
 
+mkdir /var/run/eagle-eye-ai/
+chown -R ubuntu:ubuntu /var/run/eagle-eye-ai/
+chmod u+w /var/run/eagle-eye-ai/
 
 
 # Logs to AWS Cloudwatch
