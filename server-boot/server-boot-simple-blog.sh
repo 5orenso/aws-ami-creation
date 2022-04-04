@@ -133,7 +133,7 @@ git clone https://github.com/5orenso/simple-blog.git
 
 # Install all packages
 cd /srv/simple-blog/
-npm install --production --force
+npm install --force
 
 cd /srv/musher/
 npm install --production --force
@@ -219,31 +219,25 @@ Description=simple-blog-${domain}
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/config/node-ffe-web/ffe-dealerweb-c587eaa3f46b.json"
-ExecStart=/usr/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/config-${domain}.js  >> /var/log/simple-blog/simple-blog-${domain}.log 2>&1
+ExecStart=/usr/local/bin/node /srv/simple-blog/app/server.js -c /srv/config/simple-blog/config-${domain}.js  >> /var/log/simple-blog/simple-blog-${domain}.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
 EOF
+
+# Reload system daemon
+systemctl daemon-reload
 
 # Run the application:
 service simple-blog-${domain} start
 
 # Add crontab entries
 cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
-/usr/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/config-${domain}.js > /dev/null 2>&1
-EOF
-
-cat >> /var/awslogs/etc/awslogs.conf <<EOF
-[/tmp/simple-blog-${domain}.log]
-datetime_format = %Y-%m-%d %H:%M:%S
-file = /var/log/simple-blog/simple-blog-${domain}.log
-buffer_duration = 5000
-log_stream_name = {instance_id}
-initial_position = start_of_file
-log_group_name = simple-blog
+/usr/local/bin/node /srv/simple-blog/app/sitemap.js -c /srv/config/simple-blog/config-${domain}.js > /dev/null 2>&1
 EOF
 
 done < "/srv/config/simple-blog/active-domains.txt"
+
 # ---[ /ALL active domains ]--------------------------------------------------
 
 cat > /etc/systemd/system/eagleeyeai.litt.no.service <<EOF
@@ -252,7 +246,7 @@ Description=eagleeyeai.litt.no
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/node /srv/eagle-eye-ai/app/server.js -c /srv/eagle-eye-ai/config/config.js >> /var/log/simple-blog/eagleeyeai.litt.no.log 2>&1
+ExecStart=/usr/local/bin/node /srv/eagle-eye-ai/app/server.js -c /srv/eagle-eye-ai/config/config.js >> /var/log/simple-blog/eagleeyeai.litt.no.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
@@ -265,7 +259,7 @@ Description=themusher.litt.no
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/musher/the-musher-100940e760c0.json"
-ExecStart=/usr/bin/node /srv/musher/app/server.js -c /srv/musher/config/config.js >> /var/log/simple-blog/themusher.litt.no.log 2>&1
+ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/musher/config/config.js >> /var/log/simple-blog/themusher.litt.no.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
@@ -277,7 +271,7 @@ Description=wifetoperator.litt.no
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/node /srv/wifet-operator-api/app/server.js -c /srv/wifet-operator-api/config/config.js >> /var/log/simple-blog/wifetoperator.litt.no.log 2>&1
+ExecStart=/usr/local/bin/node /srv/wifet-operator-api/app/server.js -c /srv/wifet-operator-api/config/config.js >> /var/log/simple-blog/wifetoperator.litt.no.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
@@ -285,4 +279,3 @@ EOF
 
 
 chmod 755 /etc/cron.hourly/simple-blog-sitemap.sh
-service awslogs restart
