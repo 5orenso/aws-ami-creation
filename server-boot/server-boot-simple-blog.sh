@@ -168,43 +168,8 @@ mkdir /var/run/eagle-eye-ai/
 chown -R ubuntu:ubuntu /var/run/eagle-eye-ai/
 chmod u+w /var/run/eagle-eye-ai/
 
-
-# Logs to AWS Cloudwatch
-cat > /var/awslogs/etc/awslogs.conf <<EOF
-[general]
-state_file = /var/awslogs/state/agent-state
-
-[/tmp/image-access.log]
-datetime_format = %Y-%m-%d %H:%M:%S
-file = /srv/simple-blog/logs/image-access.log
-buffer_duration = 5000
-log_stream_name = {instance_id}
-initial_position = start_of_file
-log_group_name = web/access
-
-[/tmp/image-access.log]
-datetime_format = %Y-%m-%d %H:%M:%S
-file = /srv/simple-blog/logs/image-access.log
-buffer_duration = 5000
-log_stream_name = {instance_id}
-initial_position = start_of_file
-log_group_name = web/access
-
-[/tmp/image-access.log]
-datetime_format = %Y-%m-%d %H:%M:%S
-file = /srv/simple-blog/logs/image-access.log
-buffer_duration = 5000
-log_stream_name = {instance_id}
-initial_position = start_of_file
-log_group_name = web/access
-
-[/tmp/image-access.log]
-datetime_format = %Y-%m-%d %H:%M:%S
-file = /srv/simple-blog/logs/image-access.log
-buffer_duration = 5000
-log_stream_name = {instance_id}
-initial_position = start_of_file
-log_group_name = web/access
+cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
+#!/bin/bash
 
 EOF
 
@@ -246,7 +211,7 @@ Description=eagleeyeai.litt.no
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/node /srv/eagle-eye-ai/app/server.js -c /srv/eagle-eye-ai/config/config.js >> /var/log/simple-blog/eagleeyeai.litt.no.log 2>&1
+ExecStart=/usr/local/bin/node /srv/eagle-eye-ai/app/server.js -c /srv/config/eagle-eye-ai/config.js >> /var/log/simple-blog/eagleeyeai.litt.no.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
@@ -265,17 +230,8 @@ Restart=on-failure
 
 EOF
 
-cat > /etc/systemd/system/wifetoperator.litt.no.service <<EOF
-[Unit]
-Description=wifetoperator.litt.no
+systemctl daemon-reload
+service eagleeyeai.litt.no start
+service themusher.litt.no start
 
-[Service]
-Type=simple
-ExecStart=/usr/local/bin/node /srv/wifet-operator-api/app/server.js -c /srv/wifet-operator-api/config/config.js >> /var/log/simple-blog/wifetoperator.litt.no.log 2>&1
-StandardOutput=null
-Restart=on-failure
-
-EOF
-
-
-chmod 755 /etc/cron.hourly/simple-blog-sitemap.sh
+chmod 755 /etc/cron.daily/simple-blog-sitemap.sh
