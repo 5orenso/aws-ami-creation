@@ -44,7 +44,23 @@ build-essential checkinstall \
 libreadline-gplv2-dev libncursesw5-dev libssl-dev \
 libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
 libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm-dev libnss3-dev libxss-dev \
+openslide-tools python-openslide python3-pip git-lfs \
 --yes
+
+# Python tools for openslide and tensorflow
+yes | pip install openslide-python
+yes | pip install tensorflow
+yes | pip install numpy scipy
+
+# Upgrade pixman from the buggy 0.38 version to make openslide work.
+cd /tmp/
+wget https://cairographics.org/releases/pixman-0.40.0.tar.gz
+tar -xvf pixman-0.40.0.tar.gz
+cd pixman-0.40.0
+./configure
+make
+sudo make install
+
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
@@ -60,7 +76,7 @@ sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
 
 
 cat > /etc/init.d/dropbox <<'EOF'
-#!/bin/sh
+#!/usr/bin/sh
 # dropbox service
 # Replace with linux users you want to run Dropbox clients for
 

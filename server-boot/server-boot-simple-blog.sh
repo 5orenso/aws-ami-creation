@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 export LC_ALL=en_US.UTF-8
 
@@ -140,6 +140,8 @@ npm install --production --force
 
 cd /srv/eagle-eye-ai/
 npm install --production --force
+git lfs fetch --all
+git lfs pull
 
 # Logging folders
 mkdir /var/log/simple-blog/
@@ -169,7 +171,7 @@ chown -R ubuntu:ubuntu /var/run/eagle-eye-ai/
 chmod u+w /var/run/eagle-eye-ai/
 
 cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
-#!/bin/bash
+#!/usr/bin/bash
 
 EOF
 
@@ -224,7 +226,7 @@ Description=themusher.litt.no
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/musher/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/musher/config/config.js >> /var/log/simple-blog/themusher.litt.no.log 2>&1
+ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/config/musher/config.js >> /var/log/simple-blog/themusher.litt.no.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
@@ -235,3 +237,41 @@ service eagleeyeai.litt.no start
 service themusher.litt.no start
 
 chmod 755 /etc/cron.daily/simple-blog-sitemap.sh
+
+cat >> /etc/cron.hourly/themusher <<EOF
+#!/usr/bin/bash
+
+# /usr/local/bin/node /srv/musher/bin/scrollView-update-stories.js -c /srv/config/musher/config.js -d 2  >> /home/ubuntu/scrollView-update-stories.js.log 2>&1
+
+# 1/* * * * * /usr/local/bin/node /srv/musher/bin/get-tracking-data-pasviktrail-2022.js --config /srv/config/musher/config.js --race pasviktrail_2022 >> /home/ubuntu/get-tracking-data-pasviktrail-2022.js.log 2>&1
+EOF
+
+chmod 755 /etc/cron.hourly/themusher
+
+cat >> /etc/cron.daily/themusher <<EOF
+#!/usr/bin/bash
+
+# Generate all stats:
+# /usr/local/bin/node /srv/musher/bin/getStats.js -c /srv/config/musher/config.js >> /home/ubuntu/getStats.js.log 2>&1
+
+# Generate new map images for workouts that nobody has opened:
+# /usr/local/bin/node /srv/musher/bin/generate-new-map-images.js -c /srv/config/musher/config.js -d 1  >> /home/ubuntu/generate-new-map-images.js.log 2>&1
+
+# Calculate dog fitness based on workouts:
+# /usr/local/bin/node /srv/musher/bin/dog-calc-fitness.js -c /srv/config/musher/config.js --yesterday  >> /home/ubuntu/dog-calc-fitness.js.log 2>&1
+
+# Calculate team fitness based on workouts:
+# /usr/local/bin/node /srv/musher/bin/team-calc-fitness.js -c /srv/config/musher/config.js --yesterday  >> /home/ubuntu/team-calc-fitness.js.log 2>&1
+
+# Award trophies based on your progress:
+# /bin/bash /srv/musher/bin/trophy-awards-2021-2022.sh >> /home/ubuntu/trophy-awards-2021-2022.sh.log 2>&1
+
+# Send birthday emails:
+# /usr/local/bin/node /srv/musher/bin/send-birthday-reminder.js -c /srv/config/musher/config.js >> /home/ubuntu/send-birthday-reminder.js.log 2>&1
+
+# Send notification emails:
+# /usr/local/bin/node /srv/musher/bin/send-notification-reminder.js -c /srv/config/musher/config.js -l 5000 >> /home/ubuntu/send-notification-reminder.js.log 2>&1
+
+EOF
+
+chmod 755 /etc/cron.daily/themusher
