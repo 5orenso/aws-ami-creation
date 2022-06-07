@@ -129,6 +129,7 @@ cd /srv/
 git clone $GIT_REPO_CONFIG
 git clone $GIT_REPO_MUSHER
 git clone $GIT_REPO_EAGLEEYE
+git clone $GIT_REPO_WIFET_OPERATOR
 git clone https://github.com/5orenso/simple-blog.git
 
 # Install all packages
@@ -143,6 +144,9 @@ npm install --production --force
 git lfs fetch --all
 git lfs pull
 
+cd /srv/wifet-operator-api/
+npm install --production --force
+
 # Logging folders
 mkdir /var/log/simple-blog/
 chown -R ubuntu:ubuntu /var/log/simple-blog/
@@ -152,6 +156,9 @@ mkdir /srv/simple-blog/logs/
 chown -R ubuntu:ubuntu /srv/simple-blog/logs/
 chmod u+w /srv/simple-blog/logs/
 
+mkdir /var/log/wifet-operator-api/
+chown -R ubuntu:ubuntu /var/log/wifet-operator-api/
+chmod u+w /var/log/wifet-operator-api/
 
 mkdir /var/log/musher/
 chown -R ubuntu:ubuntu /var/log/musher/
@@ -169,6 +176,10 @@ chmod u+w /var/run/musher/
 mkdir /var/run/eagle-eye-ai/
 chown -R ubuntu:ubuntu /var/run/eagle-eye-ai/
 chmod u+w /var/run/eagle-eye-ai/
+
+mkdir /var/run/wifet-operator-api/
+chown -R ubuntu:ubuntu /var/run/wifet-operator-api/
+chmod u+w /var/run/wifet-operator-api/
 
 cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
 #!/usr/bin/bash
@@ -219,6 +230,18 @@ Restart=on-failure
 
 EOF
 
+cat > /etc/systemd/system/wifetoperator.litt.no.service <<EOF
+[Unit]
+Description=wifetoperator.litt.no
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/node /srv/wifet-operator-api/app/server.js -c /srv/config/wifet-operator/config.js >> /var/log/simple-blog/wifetoperator.litt.no.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
 cat > /etc/systemd/system/themusher.litt.no.service <<EOF
 [Unit]
 Description=themusher.litt.no
@@ -245,8 +268,16 @@ cat >> /etc/cron.hourly/themusher <<EOF
 
 # 1/* * * * * /usr/local/bin/node /srv/musher/bin/get-tracking-data-pasviktrail-2022.js --config /srv/config/musher/config.js --race pasviktrail_2022 >> /home/ubuntu/get-tracking-data-pasviktrail-2022.js.log 2>&1
 EOF
-
 chmod 755 /etc/cron.hourly/themusher
+
+cat >> /etc/cron.hourly/wifet <<EOF
+#!/usr/bin/bash
+
+# bash /srv/wifet-operator-api/bin/get-weather.sh
+
+EOF
+chmod 755 /etc/cron.hourly/wifet
+
 
 cat >> /etc/cron.daily/themusher <<EOF
 #!/usr/bin/bash
