@@ -119,13 +119,19 @@ mkdir /srv/
 cd /srv/
 git clone $GIT_REPO_CONFIG
 git clone $GIT_REPO_SIMPLE_BLOG
-git clone $GIT_REPO_MUSHER
+mkdir /srv/dev-musher
+git clone $GIT_REPO_MUSHER dev-musher
+cd /srv/dev-musher
+git checkout beta
 
 # Install all packages
 cd /srv/simple-blog/
 npm install --force
 
 cd /srv/musher/
+npm install --production --force
+
+cd /srv/dev-musher/
 npm install --production --force
 
 # Logging folders
@@ -142,6 +148,10 @@ mkdir /var/log/musher/
 chown -R ubuntu:ubuntu /var/log/musher/
 chmod u+w /var/log/musher/
 
+mkdir /var/log/dev-musher/
+chown -R ubuntu:ubuntu /var/log/dev-musher/
+chmod u+w /var/log/dev-musher/
+
 # Pid file
 mkdir /var/run/simple-blog/
 chown -R ubuntu:ubuntu /var/run/simple-blog/
@@ -150,6 +160,10 @@ chmod u+w /var/run/simple-blog/
 mkdir /var/run/musher/
 chown -R ubuntu:ubuntu /var/run/musher/
 chmod u+w /var/run/musher/
+
+mkdir /var/run/dev-musher/
+chown -R ubuntu:ubuntu /var/run/dev-musher/
+chmod u+w /var/run/dev-musher/
 
 # node app/server.js -c /srv/config/musher/config.js
 
@@ -200,7 +214,23 @@ StandardError=file:/var/log/musher/themusher.app.error
 Restart=on-failure
 EOF
 
+cat > /etc/systemd/system/dev-themusher.litt.no.service <<EOF
+[Unit]
+Description=dev.themusher.app
+
+[Service]
+Type=simple
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/dev-musher/the-musher-100940e760c0.json"
+ExecStart=/usr/local/bin/node /srv/dev-musher/app/server.js -c /srv/config/musher/dev-config.js
+
+StandardOutput=file:/var/log/dev-musher/themusher.app.log
+StandardError=file:/var/log/dev-musher/themusher.app.error
+
+Restart=on-failure
+EOF
+
 # Run the application:
 service simple-blog-femundlopet.no start
 service simple-blog-themusher.no start
 service themusher.litt.no start
+service dev-themusher.litt.no start
