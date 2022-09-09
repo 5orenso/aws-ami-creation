@@ -119,6 +119,8 @@ mkdir /srv/
 cd /srv/
 git clone $GIT_REPO_CONFIG
 git clone $GIT_REPO_SIMPLE_BLOG
+git clone $GIT_REPO_MUSHER
+
 mkdir /srv/dev-musher
 git clone $GIT_REPO_MUSHER dev-musher
 cd /srv/dev-musher
