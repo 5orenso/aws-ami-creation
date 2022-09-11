@@ -117,18 +117,18 @@ service telegraf start
 # Get the application you want to run on this server:
 mkdir /srv/
 cd /srv/
-git clone $GIT_REPO_CONFIG
-git clone $GIT_REPO_SIMPLE_BLOG
-git clone $GIT_REPO_MUSHER
+git clone --depth 1 $GIT_REPO_CONFIG
+git clone --depth 1 $GIT_REPO_SIMPLE_BLOG
+git clone --depth 1 $GIT_REPO_MUSHER
 
 mkdir /srv/dev-musher
-git clone $GIT_REPO_MUSHER dev-musher
+git clone --depth 1 $GIT_REPO_MUSHER dev-musher
 cd /srv/dev-musher
 git checkout beta
 
 # Install all packages
 cd /srv/simple-blog/
-npm install --force
+npm install --production --force
 
 cd /srv/musher/
 npm install --production --force
