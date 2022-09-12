@@ -128,7 +128,7 @@ git checkout beta
 
 # Install all packages
 cd /srv/simple-blog/
-npm install --production --force
+npm install --force
 
 cd /srv/musher/
 npm install --production --force
