@@ -124,6 +124,11 @@ git clone --depth 1 $GIT_REPO_MUSHER
 mkdir /srv/dev-musher
 git clone --depth 1 $GIT_REPO_MUSHER dev-musher
 cd /srv/dev-musher
+git remote set-branches origin beta
+git fetch --depth 1 origin beta
+git checkout beta
+
+
 git checkout beta
 
 # Install all packages
