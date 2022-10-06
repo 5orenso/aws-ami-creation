@@ -128,9 +128,6 @@ git remote set-branches origin beta
 git fetch --depth 1 origin beta
 git checkout beta
 
-
-git checkout beta
-
 # Install all packages
 cd /srv/simple-blog/
 npm install --force
