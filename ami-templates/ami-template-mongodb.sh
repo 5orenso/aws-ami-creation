@@ -99,12 +99,20 @@ Attach ebs disks when launching instance:
        mongo22.flyfisheurope.com   mongodb-replicaset-22    vol-069fcace08919a6cb
        mongo23.flyfisheurope.com   mongodb-replicaset-23    vol-0ed7d6cac8c5ecdee
 
+# Go to aws web console and attach the ebs disks to the instance.
+
+
 First time you should format the file systems:
 $ sudo fdisk -l
-$ sudo mkfs.xfs /dev/xvdf
-$ mkdir /data
-$ mount /dev/xvdf /var/lib/mongodb
-$ df -T
+$ sudo mkfs.xfs /dev/nvme1n1
+$ sudo mkdir /data
+$ sudo mount /dev/nvme1n1 /data
+$ df -h
+# /dev/nvme1n1   xfs      167690240 1202920 166487320   1% /data
+
+# lsblk - list block devices
+# mount - mount a filesystem (used for general mount info too):
+$ findmnt /
 
 
 --------------------------------------------------------------------------------
@@ -122,12 +130,20 @@ mongo21.flyfisheurope.com
 $ sudo hostname mongo21.flyfisheurope.com
 
 3. Edit mongod bindIp
+$ ip a
 $ sudo vim /etc/mongod.conf
+# Where and how to store data.
+storage:
+  dbPath: /data/mongodb
+
+# network interfaces
 net:
   bindIp: 172.30.0.221,127.0.0.1
 
 3.1 Stop server
 $ sudo service mongod stop
+$ sudo mkdir /data/mongodb
+$ sudo chown mongodb.mongodb /data/mongodb
 
 3.2 Start server again
 $ sudo service mongod start
@@ -150,6 +166,7 @@ $ mongo
 > rs.add("mongo20.flyfisheurope.com:27017", true)
 > rs.add("mongo21.flyfisheurope.com:27017")
 > rs.add("mongo22.flyfisheurope.com:27017")
+> rs.add("mongo23.flyfisheurope.com:27017")
 > rs.config()
 
 > rs.remove("mongo21.flyfisheurope.com:27017")
@@ -363,7 +380,7 @@ sudo timedatectl set-ntp on
 # Crontab for root
 cat > /tmp/crontab.root <<'EOF'
 # Cleanup old backups.
-0 4 * * *   /usr/bin/find /var/backups/mongodb/ -type f -mtime +15 | xargs rm
+0 4 * * *   /usr/bin/find /var/backups/mongodb/ -type f -mtime 1 | xargs rm
 
 # Send disk warnings
 */5 * * * * /srv/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used-incl-cache-buff --mem-used --mem-avail --disk-space-util --disk-path / --disk-space-used --disk-space-avail

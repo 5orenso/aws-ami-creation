@@ -130,6 +130,7 @@ git clone $GIT_REPO_CONFIG
 git clone $GIT_REPO_MUSHER
 git clone $GIT_REPO_EAGLEEYE
 git clone $GIT_REPO_WIFET_OPERATOR
+git clone $GIT_REPO_WELAND
 git clone https://github.com/5orenso/simple-blog.git
 
 # Install all packages
@@ -145,6 +146,9 @@ git lfs fetch --all
 git lfs pull
 
 cd /srv/wifet-operator-api/
+npm install --production --force
+
+cd /srv/weland/backend/
 npm install --production --force
 
 # Logging folders
@@ -164,10 +168,26 @@ mkdir /var/log/musher/
 chown -R ubuntu:ubuntu /var/log/musher/
 chmod u+w /var/log/musher/
 
+mkdir /var/log/eagle-eye-ai/
+chown -R ubuntu:ubuntu /var/log/eagle-eye-ai/
+chmod u+w /var/log/eagle-eye-ai/
+
+mkdir /var/log/weland/
+chown -R ubuntu:ubuntu /var/log/weland/
+chmod u+w /var/log/weland/
+
+mkdir /srv/weland/backend/logs/
+chown -R ubuntu:ubuntu /srv/weland/backend/logs/
+chmod u+w /srv/weland/backend/logs/
+
 # Pid file
 mkdir /var/run/simple-blog/
 chown -R ubuntu:ubuntu /var/run/simple-blog/
 chmod u+w /var/run/simple-blog/
+
+mkdir /var/run/wifet-operator-api/
+chown -R ubuntu:ubuntu /var/run/wifet-operator-api/
+chmod u+w /var/run/wifet-operator-api/
 
 mkdir /var/run/musher/
 chown -R ubuntu:ubuntu /var/run/musher/
@@ -177,9 +197,9 @@ mkdir /var/run/eagle-eye-ai/
 chown -R ubuntu:ubuntu /var/run/eagle-eye-ai/
 chmod u+w /var/run/eagle-eye-ai/
 
-mkdir /var/run/wifet-operator-api/
-chown -R ubuntu:ubuntu /var/run/wifet-operator-api/
-chmod u+w /var/run/wifet-operator-api/
+mkdir /var/run/weland/
+chown -R ubuntu:ubuntu /var/run/weland/
+chmod u+w /var/run/weland/
 
 cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
 #!/usr/bin/bash
@@ -236,7 +256,7 @@ Description=wifetoperator.litt.no
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/node /srv/wifet-operator-api/app/server.js -c /srv/config/wifet-operator/config.js >> /var/log/simple-blog/wifetoperator.litt.no.log 2>&1
+ExecStart=/usr/local/bin/node /srv/wifet-operator-api/app/server.js -c /srv/config/wifet-operator/config.js >> /var/log/wifet-operator-api/wifetoperator.litt.no.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
@@ -249,7 +269,20 @@ Description=themusher.litt.no
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/musher/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/config/musher/config.js >> /var/log/simple-blog/themusher.litt.no.log 2>&1
+ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/config/musher/config.js >> /var/log/musher/themusher.litt.no.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+cat > /etc/systemd/system/weland.app.service <<EOF
+[Unit]
+Description=weland.app
+
+[Service]
+Type=simple
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/weland/the-musher-100940e760c0.json"
+ExecStart=/usr/local/bin/node /srv/weland/backend/app/server.js -c /srv/config/weland/config.js >> /var/log/weland/weland.app.log 2>&1
 StandardOutput=null
 Restart=on-failure
 
@@ -258,6 +291,7 @@ EOF
 systemctl daemon-reload
 service eagleeyeai.litt.no start
 service themusher.litt.no start
+service weland.app start
 
 chmod 755 /etc/cron.daily/simple-blog-sitemap.sh
 
