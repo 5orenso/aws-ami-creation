@@ -47,67 +47,54 @@ aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creat
 
 # Install MongoDB server: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 sudo apt-get install gnupg
-wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 
-
-# Disk monitoring
-cd /srv/
-curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.2.zip -O
-unzip CloudWatchMonitoringScripts-1.2.2.zip
-rm CloudWatchMonitoringScripts-1.2.2.zip
-
-# Datadog
-#DD_API_KEY=xxxxxyyyyzzzzz bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
-
-
-# # Cloudwatch logs
-# curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-# cat > /tmp/awslogs.conf <<'EOF'
-# [general]
-# state_file = /var/awslogs/state/agent-state
-# EOF
-# python3 ./awslogs-agent-setup.py -n --region eu-west-1 -c /tmp/awslogs.conf
-
-
 # noatime for Mongodb performance.
-mv /etc/fstab /etc/fstab.old
-cat > /etc/fstab <<'EOF'
-LABEL=cloudimg-rootfs   /        ext4   defaults,noatime,discard        0 0
-/dev/nvme1n1            /data    auto   defaults,nobootwait,comment=mongodb 0       2
-EOF
+# mv /etc/fstab /etc/fstab.old
+# cat > /etc/fstab <<'EOF'
+# LABEL=cloudimg-rootfs   /        ext4   defaults,noatime,discard        0 0
+# /dev/nvme1n1            /data    auto   defaults,nobootwait,comment=mongodb 0       2
+# EOF
+
 
 cat > /home/ubuntu/README.txt <<'EOF'
 ## Some instructions on how this is setup
 
 A. Choose your lates AMI and launch a new instance:
-       mongo20.flyfisheurope.com   eu-west-1c / voter
-       mongo21.flyfisheurope.com   eu-west-1a / primary
-       mongo22.flyfisheurope.com   eu-west-1b / secondary
-       mongo23.flyfisheurope.com   eu-west-1c / secondary
+       mongo20.raskepoter.no   eu-west-1c / voter
+       mongo21.raskepoter.no   eu-west-1a / primary
+       mongo22.raskepoter.no   eu-west-1b / secondary
+       mongo23.raskepoter.no   eu-west-1c / secondary
 
 Attach network interface when launcing instance:
-       mongo20.flyfisheurope.com   mongodb-replicaset-20    eni-069994e8ac6820f7d
-       mongo21.flyfisheurope.com   mongodb-replicaset-21    eni-060679a827ac848d6
-       mongo22.flyfisheurope.com   mongodb-replicaset-22    eni-0223aa9dbdc7a53f4
-       mongo23.flyfisheurope.com   mongodb-replicaset-23    eni-0d62fa4f8cca319f1
+       mongo20.raskepoter.no   mongodb-replicaset-20    eni-0838fae723897e065
+       mongo21.raskepoter.no   mongodb-replicaset-21    eni-0a4b4492a2e639ed0
+       mongo22.raskepoter.no   mongodb-replicaset-22    eni-050655c420ba476e7
+       mongo23.raskepoter.no   mongodb-replicaset-23    eni-0b7ca7a3fe030cc78
 
 Attach ebs disks when launching instance:
-       mongo21.flyfisheurope.com   mongodb-replicaset-21    vol-0cd67d48705f6f157
-       mongo22.flyfisheurope.com   mongodb-replicaset-22    vol-069fcace08919a6cb
-       mongo23.flyfisheurope.com   mongodb-replicaset-23    vol-0ed7d6cac8c5ecdee
+       mongo21.raskepoter.no   mongodb-replicaset-21    vol-0cd67d48705f6f157
+       mongo22.raskepoter.no   mongodb-replicaset-22    vol-069fcace08919a6cb
+       mongo23.raskepoter.no   mongodb-replicaset-23    vol-0ed7d6cac8c5ecdee
+
+
+# Go to aws web console and attach the network interfaces to the instance.
 
 # Go to aws web console and attach the ebs disks to the instance.
 
-
 First time you should format the file systems:
 $ sudo fdisk -l
+$ sudo mkfs.xfs /dev/nvme2n1
 $ sudo mkfs.xfs /dev/nvme1n1
 $ sudo mkdir /data
+$ sudo mount /dev/nvme2n1 /data
 $ sudo mount /dev/nvme1n1 /data
 $ df -h
+
+$ sudo vim /etc/fstab
 # /dev/nvme1n1   xfs      167690240 1202920 166487320   1% /data
 
 # lsblk - list block devices
@@ -120,14 +107,14 @@ All servers:
 --------------------------------------------------------------------------------
 1. Edit /etc/hosts and set 127.0.0.1 to the correct hostname:
 $ sudo vim /etc/hosts
-127.0.0.1           localhost mongo21.flyfisheurope.com
+127.0.0.1           localhost mongo21.raskepoter.no
 
 1.2 Edit /etc/hostname and set the correct hostname:
 $ sudo vim /etc/hostname
-mongo21.flyfisheurope.com
+mongo21.raskepoter.no
 
 2. Set hostname with:
-$ sudo hostname mongo21.flyfisheurope.com
+$ sudo hostname mongo21.raskepoter.no
 
 3. Edit mongod bindIp
 $ ip a
@@ -138,7 +125,35 @@ storage:
 
 # network interfaces
 net:
-  bindIp: 172.30.0.221,127.0.0.1
+  bindIp: 172.31.0.221,127.0.0.1
+
+3.0.1 Create email file
+$ sudo vim /home/ubuntu/email-on-restart.sh
+#!/bin/bash
+
+FROM="mongo21@litt.no"
+TO="sorenso@gmail.com"
+SUBJECT="Mongodb service mogno21 restarted"
+BODY="You should check it out if it happens to often."
+
+aws ses send-email \
+  --from "$FROM" \
+  --destination "ToAddresses=$TO" \
+  --message "Subject={Data=$SUBJECT,Charset=utf8},Body={Text={Data=$BODY,Charset=utf8}}"
+
+$ sudo chmod 755 /home/ubuntu/email-on-restart.sh
+
+3.0.2 Edit systemd service file
+$ sudo vim /lib/systemd/system/mongod.service
+# Add Restart=always to service file
+[Service]
+...
+Restart=always
+ExecStartPost=/home/ubuntu/email-on-restart.sh
+...
+
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart mongod
 
 3.1 Stop server
 $ sudo service mongod stop
@@ -147,31 +162,51 @@ $ sudo chown mongodb.mongodb /data/mongodb
 
 3.2 Start server again
 $ sudo service mongod start
+$ sudo service mongod status
 
 
 --------------------------------------------------------------------------------
 4. On PRIMARY
 --------------------------------------------------------------------------------
 4.1 Initiate ReplicaSet with only one member
-$ mongo
+$ mongosh
 > rs.initiate()
+> db.adminCommand({
+  setDefaultRWConcern: 1,
+  defaultWriteConcern: { w: "majority" }
+});
+
+> rs.reconfig(
+  {
+    _id: "rs44",
+    members: [
+      { _id: 0, host: "mongo21.raskepoter.no:27017", priority: 1 },
+      { _id: 1, host: "mongo22.raskepoter.no:27017", priority: 0.5 },
+      // Ensure _id values are unique for each member
+      { _id: 2, host: "mongo23.raskepoter.no:27017", priority: 0.5 }, // Corrected _id from 1 to 2 for uniqueness
+      { _id: 3, host: "mongo20.raskepoter.no:27017", arbiterOnly: true }
+    ]
+  },
+  { force: true }
+);
 
 4.2 Fetch backups and restore
 $ mkdir mongodb-backup
-$ aws s3 sync s3://ffe-mongodb-backups/mongo12.flyfisheurope.com/2020/11/01/ ./mongodb-backup/ --region eu-west-1
-$ sudo mongorestore -d flyfish --drop ./mongodb-backup/flyfish/
+$ aws s3 sync s3://ffe-mongodb-backups/mongo12.raskepoter.no/2020/11/01/ ./mongodb-backup/ --region eu-west-1
+$ sudo mongorestore -d flyfish --gzip --drop ./mongodb-backup/flyfish/
 
 4.3 Add more replicas to this replicaset:
-$ mongo
-> rs.add("mongo20.flyfisheurope.com:27017", true)
-> rs.add("mongo21.flyfisheurope.com:27017")
-> rs.add("mongo22.flyfisheurope.com:27017")
-> rs.add("mongo23.flyfisheurope.com:27017")
+$ mongosh
+> rs.add("mongo20.raskepoter.no:27017", true)
+> rs.add("mongo21.raskepoter.no:27017")
+> rs.add("mongo22.raskepoter.no:27017")
+> rs.add("mongo23.raskepoter.no:27017")
 > rs.config()
 
-> rs.remove("mongo21.flyfisheurope.com:27017")
-> rs.remove("mongo22.flyfisheurope.com:27017")
-> rs.remove("mongo23.flyfisheurope.com:27017")
+> rs.remove("mongo20.raskepoter.no:27017")
+> rs.remove("mongo21.raskepoter.no:27017")
+> rs.remove("mongo22.raskepoter.no:27017")
+> rs.remove("mongo23.raskepoter.no:27017")
 > rs.config({ force: true })
 
 4.4 Set priority on one master:
@@ -209,22 +244,18 @@ EOF
 # Default setup of replica sets.
 cat > /etc/hosts <<'EOF'
 # MongoDB setup.
-127.0.0.1           localhost mongo21.flyfisheurope.com
+127.0.0.1           localhost mongo21.raskepoter.no
 
-172.30.2.200        mongo10.flyfisheurope.com
-172.30.0.201        mongo11.flyfisheurope.com
-172.30.1.201        mongo12.flyfisheurope.com
-
-172.30.2.220        mongo20.flyfisheurope.com
-172.30.0.221        mongo21.flyfisheurope.com
-172.30.1.222        mongo22.flyfisheurope.com
-172.30.2.223        mongo23.flyfisheurope.com
+172.31.32.220        mongo20.raskepoter.no
+172.31.0.221         mongo21.raskepoter.no
+172.31.16.222        mongo22.raskepoter.no
+172.31.32.223        mongo23.raskepoter.no
 
 EOF
 
-hostname mongo21.flyfisheurope.com
+hostname mongo21.raskepoter.no
 cat > /etc/hostname <<'EOF'
-mongo21.flyfisheurope.com
+mongo21.raskepoter.no
 EOF
 
 
@@ -250,7 +281,7 @@ systemLog:
 
 # network interfaces
 net:
-  bindIp: 172.30.0.221,127.0.0.1
+  bindIp: 172.31.0.221,127.0.0.1
   port: 27017
 
 #processManagement:
@@ -282,8 +313,10 @@ cat > /etc/cron.daily/mongodb <<'EOF'
 DATE=`/bin/date '+%Y/%m/%d'`
 DIR=/var/backups/mongodb/$HOSTNAME
 
-MONGODUMP=/usr/bin/mongodump
+MONGODUMP=/usr/bin/mongoshdump
 PARAM="--gzip -o "
+
+/usr/bin/find /var/backups/mongodb/ -type f | xargs rm
 
 /bin/mkdir -p $DIR/$DATE
 
@@ -314,7 +347,7 @@ SCRIPTS=/home/ubuntu/mongodb-cron-daily/
 /usr/bin/aws --region eu-west-1 s3 sync s3://ffe-mongodb-cron-daily/ $SCRIPTS
 
 for i in `find $SCRIPTS -name '*.js'` ; do
-    /usr/bin/mongo flyfish $i;
+    /usr/bin/mongosh flyfish $i;
 done
 
 EOF
@@ -332,7 +365,7 @@ SCRIPTS=/home/ubuntu/mongodb-cron-hourly/
 /usr/bin/aws --region eu-west-1 s3 sync s3://ffe-mongodb-cron-hourly/ $SCRIPTS
 
 for i in `find $SCRIPTS -name '*.js'` ; do
-    /usr/bin/mongo flyfish $i;
+    /usr/bin/mongosh flyfish $i;
 done
 
 EOF
@@ -388,6 +421,26 @@ cat > /tmp/crontab.root <<'EOF'
 EOF
 echo "Adding to crontab for root from file /tmp/crontab.root"
 crontab /tmp/crontab.root
+
+# Watch script
+
+cat > /home/ubuntu/email-on-restart.sh <<'EOF'
+#!/bin/bash
+
+FROM="mongo21@litt.no"
+TO="sorenso@gmail.com"
+SUBJECT="Mongodb service mogno21 restarted"
+BODY="You should check it out if it happens to often."
+
+aws ses send-email \
+  --from "$FROM" \
+  --destination "ToAddresses=$TO" \
+  --message "Subject={Data=$SUBJECT,Charset=utf8},Body={Text={Data=$BODY,Charset=utf8}}"
+EOF
+
+sudo chmod 755 /home/ubuntu/email-on-restart.sh
+
+
 
 # Enable ENA
 # sudo apt-get update && sudo apt-get upgrade -y linux-aws

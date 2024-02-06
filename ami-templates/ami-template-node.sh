@@ -43,18 +43,17 @@ sudo apt-get update
 # AWS tools and other software
 sudo apt-get install jq awscli git make g++ \
 build-essential checkinstall \
-libreadline-gplv2-dev libncursesw5-dev libssl-dev \
-libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
-libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm-dev libnss3-dev libxss-dev \
 --yes
-
-sudo apt-get install --only-upgrade libstdc++6 \
---yes
+#  \
+# libreadline-gplv2-dev libncursesw5-dev libssl-dev \
+# libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
+# libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm-dev libnss3-dev libxss-dev \
+# sudo apt-get install --only-upgrade libstdc++6 --yes
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
 
-sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade --yes
 
 NODE_VERSION="16.13.2"
 
@@ -67,9 +66,9 @@ sudo ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm
 #DD_API_KEY=xxxxxyyyyzzzzz bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
 
 # Telegraf
-cd /tmp/
-wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
-dpkg -i telegraf_1.2.1_amd64.deb
+# cd /tmp/
+# wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
+# dpkg -i telegraf_1.2.1_amd64.deb
 
 # Set timedatectl
 sudo timedatectl set-timezone Europe/Oslo

@@ -138,7 +138,7 @@ AWS_REGION=${AWS_REGION:-'eu-west-1'}
 
 # This is the Ubuntu base image provided by AWS. No changes needed unless you want another version.
 # Locate your base ami here: https://cloud-images.ubuntu.com/locator/ec2/
-BASE_IMAGE=${BASE_IMAGE:-'ami-06fd8a495a537da8b'} # Ubuntu Server 20.04 LTS hvm:ebs-ssd
+BASE_IMAGE=${BASE_IMAGE:-'ami-0905a3c97561e0b69'} # Ubuntu Server 22.04 LTS hvm:ebs-ssd
 # Instance type. Default is fine.
 INSTANCE_TYPE=${INSTANCE_TYPE:-'m4.large'}
 
@@ -217,7 +217,7 @@ echo ""
 echo "Running aws ec2 run-instances:"
 echo "------------------------------"
 
-# Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - ami-47a23a30
+# Ubuntu Server 22.04 LTS (HVM), SSD Volume Type - ami-47a23a30
 EC2_RUN_OUTPUT=$(aws ec2 run-instances $AWS_PROFILE \
     --region $AWS_REGION \
     --image-id $BASE_IMAGE \
@@ -253,7 +253,7 @@ echo "REMEBER TO SHUTDOWN THE AMI CREATOR SERVER (${INSTANCE_ID}) AFTER AMI IS C
 echo ""
 
 # Propose launch config name:
-TODAY=$(gnudate -d "today 13:00 " "+%Y-%m-%d")
+TODAY=$(gdate -d "today 13:00 " "+%Y-%m-%d")
 LC_NAME=${USER_DATA_FILE//ami-templates\/ami-template-/}
 LC_BASE_NAME=${LC_NAME//.sh}
 LC_NAME="lc-${LC_BASE_NAME}-${TODAY}"
