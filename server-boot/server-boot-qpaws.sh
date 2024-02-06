@@ -10,6 +10,11 @@ cat >> /etc/hosts <<'EOF'
 172.31.0.221         mongo21.raskepoter.no
 172.31.16.222        mongo22.raskepoter.no
 172.31.32.223        mongo23.raskepoter.no
+
+172.31.32.220        mongo20.flyfisheurope.com
+172.31.0.221         mongo21.flyfisheurope.com
+172.31.16.222        mongo22.flyfisheurope.com
+172.31.32.223        mongo23.flyfisheurope.com
 EOF
 
 # ----------------------------------------------------------------
@@ -53,3 +58,7 @@ EOF
 
 # Run the application:
 service themusher.litt.no start
+
+
+# ----------------------------------------------------------------
+# sudo service themusher.litt.no status
