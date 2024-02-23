@@ -18,6 +18,10 @@ cat >> /etc/hosts <<'EOF'
 EOF
 
 # ----------------------------------------------------------------
+# Install missing packet
+sudo apt-get install libatk1.0-0 -y
+
+# ----------------------------------------------------------------
 # Get the application you want to run on this server:
 mkdir /srv/
 cd /srv/

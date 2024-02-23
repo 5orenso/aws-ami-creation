@@ -452,3 +452,5 @@ IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 echo "Instance-id: ${EC2_INSTANCE_ID}"
 echo "New image name: ${IMAGE_NAME}"
 aws ec2 create-image --instance-id ${EC2_INSTANCE_ID} --name ${IMAGE_NAME} --region eu-west-1
+
+
