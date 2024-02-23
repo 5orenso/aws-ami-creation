@@ -19,7 +19,31 @@ EOF
 
 # ----------------------------------------------------------------
 # Install missing packet
-sudo apt-get install libatk1.0-0 -y
+sudo apt update
+sudo apt-get install \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxext6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    fonts-noto-color-emoji \
+    gconf-service \
+    gconf2 \
+    libasound2 \
+    libgbm1 \
+    libpango-1.0-0 -y
+
+sudo ldconfig
 
 # ----------------------------------------------------------------
 # Get the application you want to run on this server:
