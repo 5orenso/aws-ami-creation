@@ -49,7 +49,7 @@ git clone --depth 1 $GIT_REPO_CONFIG
 git clone --depth 1 $GIT_REPO_PORTALO
 
 # Install all packages
-cd /srv/soknadsguiden/
+cd /srv/soknadsguiden/backend/
 npm install --production --force
 
 # Logging folders
@@ -70,7 +70,7 @@ Description=soknadsguiden.app
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/node /srv/soknadsguiden/app/server.js -c /srv/config/soknadsguiden/config.js
+ExecStart=/usr/local/bin/node /srv/soknadsguiden/backend/app/server.js -c /srv/config/soknadsguiden/config.js
 
 StandardOutput=file:/var/log/soknadsguiden/soknadsguiden.app.log
 StandardError=file:/var/log/soknadsguiden/soknadsguiden.app.error
