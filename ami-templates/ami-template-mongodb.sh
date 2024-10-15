@@ -63,8 +63,29 @@ sudo apt-get install -y mongodb-org
 cat > /home/ubuntu/README.txt <<'EOF'
 ## Some instructions on how this is setup
 
+# Create network interfaces and ebs disks in AWS console.
+
+## Elastic IPs
+mongodb-replicaset-20    xxx.xxx.xxx.xxx
+mongodb-replicaset-21    xxx.xxx.xxx.xxx
+mongodb-replicaset-22    xxx.xxx.xxx.xxx
+mongodb-replicaset-23    xxx.xxx.xxx.xxx
+
+## Network interfaces
+mongodb-replicaset-20  base-subnet-a  10.1.16.220
+mongodb-replicaset-21  base-subnet-a  10.1.16.221
+mongodb-replicaset-22  base-subnet-b  10.1.32.222
+mongodb-replicaset-23  base-subnet-c  10.1.0.223
+
+## EBS disks
+mongodb-replicaset-21  100 GiB  100 iops  io1  /dev/nvme1n1
+mongodb-replicaset-22  100 GiB  100 iops  io1  /dev/nvme1n1
+mongodb-replicaset-23  100 GiB  100 iops  io1  /dev/nvme1n1
+
+
+
 A. Choose your lates AMI and launch a new instance:
-       mongo20.raskepoter.no   eu-west-1c / voter
+       mongo20.raskepoter.no   eu-west-1a / voter
        mongo21.raskepoter.no   eu-west-1a / primary
        mongo22.raskepoter.no   eu-west-1b / secondary
        mongo23.raskepoter.no   eu-west-1c / secondary
@@ -81,16 +102,10 @@ Attach ebs disks when launching instance:
        mongo23.raskepoter.no   mongodb-replicaset-23    vol-0ed7d6cac8c5ecdee
 
 
-# Go to aws web console and attach the network interfaces to the instance.
-
-# Go to aws web console and attach the ebs disks to the instance.
-
 First time you should format the file systems:
 $ sudo fdisk -l
-$ sudo mkfs.xfs /dev/nvme2n1
 $ sudo mkfs.xfs /dev/nvme1n1
 $ sudo mkdir /data
-$ sudo mount /dev/nvme2n1 /data
 $ sudo mount /dev/nvme1n1 /data
 $ df -h
 
@@ -109,6 +124,12 @@ All servers:
 $ sudo vim /etc/hosts
 127.0.0.1           localhost mongo21.raskepoter.no
 
+10.1.16.220     mongo20.raskepoter.no
+10.1.16.221     mongo21.raskepoter.no
+10.1.32.222     mongo22.raskepoter.no
+10.1.0.223      mongo23.raskepoter.no
+
+
 1.2 Edit /etc/hostname and set the correct hostname:
 $ sudo vim /etc/hostname
 mongo21.raskepoter.no
@@ -125,7 +146,8 @@ storage:
 
 # network interfaces
 net:
-  bindIp: 172.31.0.221,127.0.0.1
+  bindIp: 10.1.16.221,127.0.0.1
+
 
 3.0.1 Create email file
 $ sudo vim /home/ubuntu/email-on-restart.sh
@@ -142,6 +164,7 @@ aws ses send-email \
   --message "Subject={Data=$SUBJECT,Charset=utf8},Body={Text={Data=$BODY,Charset=utf8}}"
 
 $ sudo chmod 755 /home/ubuntu/email-on-restart.sh
+
 
 3.0.2 Edit systemd service file
 $ sudo vim /lib/systemd/system/mongod.service
@@ -219,8 +242,8 @@ $ mongo
 --------------------------------------------------------------------------------
 5. On SECONDARY
 --------------------------------------------------------------------------------
-$ mongo
-> db.setSecondaryOk()
+$ mongosh
+> db.getMongo().setReadPref("primaryPreferred")
 
 6. Disable mongo-scripts in /etc/cron.daily/mongodb-scripts
 $ sudo rm /etc/cron.daily/mongodb-scripts
@@ -246,10 +269,10 @@ cat > /etc/hosts <<'EOF'
 # MongoDB setup.
 127.0.0.1           localhost mongo21.raskepoter.no
 
-172.31.32.220        mongo20.raskepoter.no
-172.31.0.221         mongo21.raskepoter.no
-172.31.16.222        mongo22.raskepoter.no
-172.31.32.223        mongo23.raskepoter.no
+10.1.16.220     mongo20.raskepoter.no
+10.1.16.221     mongo21.raskepoter.no
+10.1.32.222     mongo22.raskepoter.no
+10.1.0.223      mongo23.raskepoter.no
 
 EOF
 
