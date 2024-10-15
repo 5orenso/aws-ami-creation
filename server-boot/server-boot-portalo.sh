@@ -80,7 +80,7 @@ EOF
 
 
 # Run the application:
-service soknadsguiden.service start
+service soknadsguiden start
 
 
 # ----------------------------------------------------------------
