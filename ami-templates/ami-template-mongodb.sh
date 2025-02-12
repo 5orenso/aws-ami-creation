@@ -336,7 +336,7 @@ cat > /etc/cron.daily/mongodb <<'EOF'
 DATE=`/bin/date '+%Y/%m/%d'`
 DIR=/var/backups/mongodb/$HOSTNAME
 
-MONGODUMP=/usr/bin/mongoshdump
+MONGODUMP=/usr/bin/mongodump
 PARAM="--gzip -o "
 
 /usr/bin/find /var/backups/mongodb/ -type f | xargs rm

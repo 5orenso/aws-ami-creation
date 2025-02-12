@@ -126,30 +126,38 @@ service telegraf start
 # Get the application you want to run on this server:
 mkdir /srv/
 cd /srv/
-git clone $GIT_REPO_CONFIG
-git clone $GIT_REPO_MUSHER
-git clone $GIT_REPO_EAGLEEYE
-git clone $GIT_REPO_WIFET_OPERATOR
-git clone $GIT_REPO_WELAND
-git clone https://github.com/5orenso/simple-blog.git
+git clone --depth=1 $GIT_REPO_CONFIG
+git clone --depth=1 $GIT_REPO_EAGLEEYE
+git clone --depth=1 $GIT_REPO_WELAND
+git clone --depth=1 $GIT_REPO_LIVERACE
+git clone --depth=1 $GIT_REPO_KEEPSPOT
+git clone --depth=1 $GIT_REPO_RASKEPOTER
+git clone --depth=1 $GIT_REPO_DYREJOURNAL
+git clone --depth=1 $GIT_REPO_SIMPLE_BLOG
 
 # Install all packages
-cd /srv/simple-blog/
-npm install --force
-
-cd /srv/musher/
-npm install --production --force
-
 cd /srv/eagle-eye-ai/
-npm install --production --force
+npm install --force
 git lfs fetch --all
 git lfs pull
 
-cd /srv/wifet-operator-api/
-npm install --production --force
-
 cd /srv/weland/backend/
-npm install --production --force
+npm install --force
+
+cd /srv/liverace/backend/
+npm install --force
+
+cd /srv/keepspot/backend/
+npm install --force
+
+cd /srv/raskepoter/backend/
+npm install --force
+
+cd /srv/dyrejournal/backend/
+npm install --force
+
+cd /srv/simple-blog/
+npm install --force
 
 # Logging folders
 mkdir /var/log/simple-blog/
@@ -160,46 +168,9 @@ mkdir /srv/simple-blog/logs/
 chown -R ubuntu:ubuntu /srv/simple-blog/logs/
 chmod u+w /srv/simple-blog/logs/
 
-mkdir /var/log/wifet-operator-api/
-chown -R ubuntu:ubuntu /var/log/wifet-operator-api/
-chmod u+w /var/log/wifet-operator-api/
-
-mkdir /var/log/musher/
-chown -R ubuntu:ubuntu /var/log/musher/
-chmod u+w /var/log/musher/
-
 mkdir /var/log/eagle-eye-ai/
 chown -R ubuntu:ubuntu /var/log/eagle-eye-ai/
 chmod u+w /var/log/eagle-eye-ai/
-
-mkdir /var/log/weland/
-chown -R ubuntu:ubuntu /var/log/weland/
-chmod u+w /var/log/weland/
-
-mkdir /srv/weland/backend/logs/
-chown -R ubuntu:ubuntu /srv/weland/backend/logs/
-chmod u+w /srv/weland/backend/logs/
-
-# Pid file
-mkdir /var/run/simple-blog/
-chown -R ubuntu:ubuntu /var/run/simple-blog/
-chmod u+w /var/run/simple-blog/
-
-mkdir /var/run/wifet-operator-api/
-chown -R ubuntu:ubuntu /var/run/wifet-operator-api/
-chmod u+w /var/run/wifet-operator-api/
-
-mkdir /var/run/musher/
-chown -R ubuntu:ubuntu /var/run/musher/
-chmod u+w /var/run/musher/
-
-mkdir /var/run/eagle-eye-ai/
-chown -R ubuntu:ubuntu /var/run/eagle-eye-ai/
-chmod u+w /var/run/eagle-eye-ai/
-
-mkdir /var/run/weland/
-chown -R ubuntu:ubuntu /var/run/weland/
-chmod u+w /var/run/weland/
 
 cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
 #!/usr/bin/bash
@@ -250,31 +221,6 @@ Restart=on-failure
 
 EOF
 
-cat > /etc/systemd/system/wifetoperator.litt.no.service <<EOF
-[Unit]
-Description=wifetoperator.litt.no
-
-[Service]
-Type=simple
-ExecStart=/usr/local/bin/node /srv/wifet-operator-api/app/server.js -c /srv/config/wifet-operator/config.js >> /var/log/wifet-operator-api/wifetoperator.litt.no.log 2>&1
-StandardOutput=null
-Restart=on-failure
-
-EOF
-
-cat > /etc/systemd/system/themusher.litt.no.service <<EOF
-[Unit]
-Description=themusher.litt.no
-
-[Service]
-Type=simple
-Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/musher/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/config/musher/config.js >> /var/log/musher/themusher.litt.no.log 2>&1
-StandardOutput=null
-Restart=on-failure
-
-EOF
-
 cat > /etc/systemd/system/weland.app.service <<EOF
 [Unit]
 Description=weland.app
@@ -288,55 +234,67 @@ Restart=on-failure
 
 EOF
 
+cat > /etc/systemd/system/liverace.app.service <<EOF
+[Unit]
+Description=liverace.app
+
+[Service]
+Type=simple
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/liverace/the-musher-100940e760c0.json"
+ExecStart=/usr/local/bin/node /srv/liverace/backend/app/server.js -c /srv/config/liverace/config.js >> /var/log/liverace/liverace.app.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+cat > /etc/systemd/system/keepspot.app.service <<EOF
+[Unit]
+Description=keepspot.app
+
+[Service]
+Type=simple
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/keepspot/the-musher-100940e760c0.json"
+ExecStart=/usr/local/bin/node /srv/keepspot/backend/app/server.js -c /srv/config/keepspot/config.js >> /var/log/keepspot/keepspot.app.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+cat > /etc/systemd/system/raskepoter.app.service <<EOF
+[Unit]
+Description=raskepoter.app
+
+[Service]
+Type=simple
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/raskepoter/the-musher-100940e760c0.json"
+ExecStart=/usr/local/bin/node /srv/raskepoter/backend/app/server.js -c /srv/config/raskepoter/config.js >> /var/log/raskepoter/raskepoter.app.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+cat > /etc/systemd/system/dyrejournal.app.service <<EOF
+[Unit]
+Description=dyrejournal.app
+
+[Service]
+Type=simple
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/dyrejournal/the-musher-100940e760c0.json"
+ExecStart=/usr/local/bin/node /srv/dyrejournal/backend/app/server.js -c /srv/config/dyrejournal/config.js >> /var/log/dyrejournal/dyrejournal.app.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
+
 systemctl daemon-reload
 service eagleeyeai.litt.no start
 service themusher.litt.no start
 service weland.app start
+service liverace.app start
+service keepspot.app start
+service raskepoter.app start
+service dyrejournal.app start
+
 
 chmod 755 /etc/cron.daily/simple-blog-sitemap.sh
-
-cat >> /etc/cron.hourly/themusher <<EOF
-#!/usr/bin/bash
-
-# /usr/local/bin/node /srv/musher/bin/scrollView-update-stories.js -c /srv/config/musher/config.js -d 2  >> /home/ubuntu/scrollView-update-stories.js.log 2>&1
-
-# 1/* * * * * /usr/local/bin/node /srv/musher/bin/get-tracking-data-pasviktrail-2022.js --config /srv/config/musher/config.js --race pasviktrail_2022 >> /home/ubuntu/get-tracking-data-pasviktrail-2022.js.log 2>&1
-EOF
-chmod 755 /etc/cron.hourly/themusher
-
-cat >> /etc/cron.hourly/wifet <<EOF
-#!/usr/bin/bash
-
-# bash /srv/wifet-operator-api/bin/get-weather.sh
-
-EOF
-chmod 755 /etc/cron.hourly/wifet
-
-
-cat >> /etc/cron.daily/themusher <<EOF
-#!/usr/bin/bash
-
-# Generate all stats:
-# /usr/local/bin/node /srv/musher/bin/getStats.js -c /srv/config/musher/config.js >> /home/ubuntu/getStats.js.log 2>&1
-
-# Generate new map images for workouts that nobody has opened:
-# /usr/local/bin/node /srv/musher/bin/generate-new-map-images.js -c /srv/config/musher/config.js -d 1  >> /home/ubuntu/generate-new-map-images.js.log 2>&1
-
-# Calculate dog fitness based on workouts:
-# /usr/local/bin/node /srv/musher/bin/dog-calc-fitness.js -c /srv/config/musher/config.js --yesterday  >> /home/ubuntu/dog-calc-fitness.js.log 2>&1
-
-# Calculate team fitness based on workouts:
-# /usr/local/bin/node /srv/musher/bin/team-calc-fitness.js -c /srv/config/musher/config.js --yesterday  >> /home/ubuntu/team-calc-fitness.js.log 2>&1
-
-# Award trophies based on your progress:
-# /bin/bash /srv/musher/bin/trophy-awards-2021-2022.sh >> /home/ubuntu/trophy-awards-2021-2022.sh.log 2>&1
-
-# Send birthday emails:
-# /usr/local/bin/node /srv/musher/bin/send-birthday-reminder.js -c /srv/config/musher/config.js >> /home/ubuntu/send-birthday-reminder.js.log 2>&1
-
-# Send notification emails:
-# /usr/local/bin/node /srv/musher/bin/send-notification-reminder.js -c /srv/config/musher/config.js -l 5000 >> /home/ubuntu/send-notification-reminder.js.log 2>&1
-
-EOF
-
-chmod 755 /etc/cron.daily/themusher
