@@ -122,6 +122,24 @@ EOF
 service telegraf stop
 service telegraf start
 
+
+# Install missing modules
+sudo apt-get update
+sudo apt-get install -y \
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libx11-xcb1 \
+    libdrm2 \
+    libgbm1 \
+    libxdamage1 \
+    libxcomposite1 \
+    libxext6 \
+    libxfixes3 \
+    libxrandr2 \
+    libgtk-3-0 \
+    libasound2
+
 # ----------------------------------------------------------------
 # Get the application you want to run on this server:
 mkdir /srv/

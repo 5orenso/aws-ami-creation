@@ -39,6 +39,20 @@ EC2_INSTANCE_ID=`get_ec2_instance_id`
 
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test --yes
 sudo apt-get update
+sudo apt-get install -y \
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libx11-xcb1 \
+    libdrm2 \
+    libgbm1 \
+    libxdamage1 \
+    libxcomposite1 \
+    libxext6 \
+    libxfixes3 \
+    libxrandr2 \
+    libgtk-3-0 \
+    libasound2
 
 # AWS tools and other software
 sudo apt-get install jq awscli git make g++ \
