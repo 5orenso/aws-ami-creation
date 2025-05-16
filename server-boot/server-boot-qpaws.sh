@@ -11,10 +11,6 @@ cat >> /etc/hosts <<'EOF'
 172.31.16.222        mongo22.raskepoter.no
 172.31.32.223        mongo23.raskepoter.no
 
-172.31.32.220        mongo20.flyfisheurope.com
-172.31.0.221         mongo21.flyfisheurope.com
-172.31.16.222        mongo22.flyfisheurope.com
-172.31.32.223        mongo23.flyfisheurope.com
 EOF
 
 # ----------------------------------------------------------------
@@ -49,7 +45,6 @@ sudo ldconfig
 # Get the application you want to run on this server:
 mkdir /srv/
 cd /srv/
-git clone --depth 1 $GIT_REPO_CONFIG
 git clone --depth 1 $GIT_REPO_MUSHER
 
 # Install all packages
@@ -68,14 +63,14 @@ chmod u+w /var/run/musher/
 
 # node app/server.js -c /srv/config/musher/config.js
 
-cat > /etc/systemd/system/themusher.litt.no.service <<EOF
+cat > /etc/systemd/system/themusher.service <<EOF
 [Unit]
 Description=themusher.app
 
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/musher/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/config/musher/config.js
+ExecStart=/usr/local/bin/node /srv/musher/app/server.js -c /srv/musher/config/config.js
 
 StandardOutput=file:/var/log/musher/themusher.app.log
 StandardError=file:/var/log/musher/themusher.app.error
@@ -85,8 +80,8 @@ EOF
 
 
 # Run the application:
-service themusher.litt.no start
+service themusher start
 
 
 # ----------------------------------------------------------------
-# sudo service themusher.litt.no status
+# sudo service themusher status
