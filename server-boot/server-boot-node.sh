@@ -3,6 +3,11 @@
 export LC_ALL=en_US.UTF-8
 
 # ----------------------------------------------------------------
+# Install missing modules
+apt-get update
+apt-get install ffmpeg
+
+# ----------------------------------------------------------------
 # Get the application you want to run on this server:
 mkdir /srv/
 cd /srv/

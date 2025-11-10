@@ -39,6 +39,7 @@ EC2_INSTANCE_ID=`get_ec2_instance_id`
 
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test --yes
 sudo apt-get update
+
 sudo apt-get install -y \
     libnss3 \
     libatk1.0-0 \
@@ -52,6 +53,14 @@ sudo apt-get install -y \
     libxfixes3 \
     libxrandr2 \
     libgtk-3-0 \
+    libxshmfence1 \
+    libxrender1 \
+    libxcb1 \
+    libxss1 \
+    fonts-liberation \
+    libappindicator3-1 \
+    xdg-utils \
+    ffmpeg \
     libasound2
 
 # AWS tools and other software
