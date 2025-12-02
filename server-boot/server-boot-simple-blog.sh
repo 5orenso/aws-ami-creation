@@ -151,6 +151,8 @@ git clone --depth=1 $GIT_REPO_LIVERACE
 git clone --depth=1 $GIT_REPO_KEEPSPOT
 git clone --depth=1 $GIT_REPO_RASKEPOTER
 git clone --depth=1 $GIT_REPO_DYREJOURNAL
+# Clone GIT_REPO_DYREJOURNAL into beta folder dyrejournal-beta
+git clone --depth=1 $GIT_REPO_DYREJOURNAL dyrejournal-beta
 git clone --depth=1 $GIT_REPO_SIMPLE_BLOG
 
 # Install all packages
@@ -174,6 +176,9 @@ npm install --force
 cd /srv/dyrejournal/backend/
 npm install --force
 
+cd /srv/dyrejournal-beta/backend/
+npm install --force
+
 cd /srv/simple-blog/
 npm install --force
 
@@ -190,6 +195,27 @@ mkdir /var/log/eagle-eye-ai/
 chown -R ubuntu:ubuntu /var/log/eagle-eye-ai/
 chmod u+w /var/log/eagle-eye-ai/
 
+mkdir /var/log/weland/
+chown -R ubuntu:ubuntu /var/log/weland/
+chmod u+w /var/log/weland/
+
+mkdir /var/log/liverace/
+chown -R ubuntu:ubuntu /var/log/liverace/
+chmod u+w /var/log/liverace/
+
+mkdir /var/log/keepspot/
+chown -R ubuntu:ubuntu /var/log/keepspot/
+chmod u+w /var/log/keepspot/
+
+mkdir /var/log/raskepoter/
+chown -R ubuntu:ubuntu /var/log/raskepoter/
+chmod u+w /var/log/raskepoter/
+
+mkdir /var/log/dyrejournal/
+chown -R ubuntu:ubuntu /var/log/dyrejournal/
+chmod u+w /var/log/dyrejournal/
+
+# Create cron job script for sitemap generation
 cat >> /etc/cron.daily/simple-blog-sitemap.sh <<EOF
 #!/usr/bin/bash
 
@@ -304,6 +330,19 @@ Restart=on-failure
 
 EOF
 
+cat > /etc/systemd/system/dyrejournal-beta.app.service <<EOF
+[Unit]
+Description=dyrejournal-beta.app
+
+[Service]
+Type=simple
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/dyrejournal-beta/the-musher-100940e760c0.json"
+ExecStart=/usr/local/bin/node /srv/dyrejournal-beta/backend/app/server.js -c /srv/config/dyrejournal/config-beta.js >> /var/log/dyrejournal/dyrejournal-beta.app.log 2>&1
+StandardOutput=null
+Restart=on-failure
+
+EOF
+
 
 systemctl daemon-reload
 service eagleeyeai.litt.no start
@@ -313,6 +352,7 @@ service liverace.app start
 service keepspot.app start
 service raskepoter.app start
 service dyrejournal.app start
+service dyrejournal-beta.app start
 
 
 chmod 755 /etc/cron.daily/simple-blog-sitemap.sh
