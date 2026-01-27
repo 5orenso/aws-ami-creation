@@ -330,29 +330,13 @@ Restart=on-failure
 
 EOF
 
-cat > /etc/systemd/system/dyrejournal-beta.app.service <<EOF
-[Unit]
-Description=dyrejournal-beta.app
-
-[Service]
-Type=simple
-Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/dyrejournal-beta/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/dyrejournal-beta/backend/app/server.js -c /srv/config/dyrejournal/config-beta.js >> /var/log/dyrejournal/dyrejournal-beta.app.log 2>&1
-StandardOutput=null
-Restart=on-failure
-
-EOF
-
-
 systemctl daemon-reload
 service eagleeyeai.litt.no start
-service themusher.litt.no start
 service weland.app start
 service liverace.app start
 service keepspot.app start
 service raskepoter.app start
 service dyrejournal.app start
-service dyrejournal-beta.app start
 
 
 chmod 755 /etc/cron.daily/simple-blog-sitemap.sh
