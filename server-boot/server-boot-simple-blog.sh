@@ -152,7 +152,7 @@ git clone --depth=1 $GIT_REPO_KEEPSPOT
 git clone --depth=1 $GIT_REPO_RASKEPOTER
 git clone --depth=1 $GIT_REPO_DYREJOURNAL
 # Clone GIT_REPO_DYREJOURNAL into beta folder dyrejournal-beta
-git clone --depth=1 $GIT_REPO_DYREJOURNAL dyrejournal-beta
+# git clone --depth=1 $GIT_REPO_DYREJOURNAL dyrejournal-beta
 git clone --depth=1 $GIT_REPO_SIMPLE_BLOG
 
 # Install all packages
@@ -176,8 +176,8 @@ npm install --force
 cd /srv/dyrejournal/backend/
 npm install --force
 
-cd /srv/dyrejournal-beta/backend/
-npm install --force
+# cd /srv/dyrejournal-beta/backend/
+# npm install --force
 
 cd /srv/simple-blog/
 npm install --force
