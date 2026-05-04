@@ -268,52 +268,88 @@ EOF
 cat > /etc/systemd/system/weland.app.service <<EOF
 [Unit]
 Description=weland.app
+After=network.target mongod.service
 
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/weland/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/weland/backend/app/server.js -c /srv/config/weland/config.js >> /var/log/weland/weland.app.log 2>&1
-StandardOutput=null
+ExecStart=/usr/local/bin/node /srv/weland/backend/app/server.js -c /srv/config/weland/config.js
+
+StandardOutput=append:/var/log/weland/weland.app.log
+StandardError=append:/var/log/weland/weland.app.error.log
+SyslogIdentifier=weland
+
 Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
 
 EOF
 
 cat > /etc/systemd/system/liverace.app.service <<EOF
 [Unit]
 Description=liverace.app
+After=network.target mongod.service
 
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/liverace/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/liverace/backend/app/server.js -c /srv/config/liverace/config.js >> /var/log/liverace/liverace.app.log 2>&1
-StandardOutput=null
+ExecStart=/usr/local/bin/node /srv/liverace/backend/app/server.js -c /srv/config/liverace/config.js
+
+StandardOutput=append:/var/log/liverace/liverace.app.log
+StandardError=append:/var/log/liverace/liverace.app.error.log
+SyslogIdentifier=liverace
+
 Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
 
 EOF
 
 cat > /etc/systemd/system/keepspot.app.service <<EOF
 [Unit]
 Description=keepspot.app
+After=network.target mongod.service
 
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/keepspot/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/keepspot/backend/app/server.js -c /srv/config/keepspot/config.js >> /var/log/keepspot/keepspot.app.log 2>&1
-StandardOutput=null
+ExecStart=/usr/local/bin/node /srv/keepspot/backend/app/server.js -c /srv/config/keepspot/config.js
+
+StandardOutput=append:/var/log/keepspot/keepspot.app.log
+StandardError=append:/var/log/keepspot/keepspot.app.error.log
+SyslogIdentifier=keepspot
+
 Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
 
 EOF
 
 cat > /etc/systemd/system/raskepoter.app.service <<EOF
 [Unit]
 Description=raskepoter.app
+After=network.target mongod.service
 
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/raskepoter/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/raskepoter/backend/app/server.js -c /srv/config/raskepoter/config.js >> /var/log/raskepoter/raskepoter.app.log 2>&1
-StandardOutput=null
+ExecStart=/usr/local/bin/node /srv/raskepoter/backend/app/server.js -c /srv/config/raskepoter/config.js
+
+StandardOutput=append:/var/log/raskepoter/raskepoter.app.log
+StandardError=append:/var/log/raskepoter/raskepoter.app.error.log
+SyslogIdentifier=raskepoter
+
 Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
 
 EOF
 
@@ -324,9 +360,17 @@ Description=dyrejournal.app
 [Service]
 Type=simple
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/srv/dyrejournal/the-musher-100940e760c0.json"
-ExecStart=/usr/local/bin/node /srv/dyrejournal/backend/app/server.js -c /srv/config/dyrejournal/config.js >> /var/log/dyrejournal/dyrejournal.app.log 2>&1
-StandardOutput=null
+ExecStart=/usr/local/bin/node /srv/dyrejournal/backend/app/server.js -c /srv/config/dyrejournal/config.js
+
+StandardOutput=append:/var/log/dyrejournal/dyrejournal.app.log
+StandardError=append:/var/log/dyrejournal/dyrejournal.app.error.log
+SyslogIdentifier=dyrejournal
+
 Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
 
 EOF
 
