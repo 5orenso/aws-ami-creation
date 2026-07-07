@@ -138,6 +138,7 @@ sudo apt-get install -y \
     libxfixes3 \
     libxrandr2 \
     libgtk-3-0 \
+    poppler-utils \
     libasound2
 
 # ----------------------------------------------------------------
