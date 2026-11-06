@@ -136,11 +136,10 @@ fi
 # Default values
 AWS_REGION=${AWS_REGION:-'eu-west-1'}
 
-# This is the Ubuntu base image provided by AWS. No changes needed unless you want another version.
-# Locate your base ami here: https://cloud-images.ubuntu.com/locator/ec2/
-BASE_IMAGE=${BASE_IMAGE:-'ami-0905a3c97561e0b69'} # Ubuntu Server 22.04 LTS hvm:ebs-ssd
 # Instance type. Default is fine.
-INSTANCE_TYPE=${INSTANCE_TYPE:-'m4.large'}
+INSTANCE_TYPE=${INSTANCE_TYPE:-'t3.medium'}
+# The Ubuntu LTS release to build on when no base image is given with -b.
+UBUNTU_RELEASE=${UBUNTU_RELEASE:-'24.04'}
 
 # Optional value
 if [ ! -z "$SUBNET" ]; then
@@ -206,6 +205,20 @@ if [ ! -z "$EXIT_MISSING" ]; then
     exit 1;
 fi
 
+# Resolve the latest Ubuntu LTS base image from Canonical's public SSM parameter
+# unless a base image was given with -b.
+if [ -z "$BASE_IMAGE" ]; then
+    BASE_IMAGE=$(aws ssm get-parameters $AWS_PROFILE --region $AWS_REGION \
+        --names /aws/service/canonical/ubuntu/server/${UBUNTU_RELEASE}/stable/current/amd64/hvm/ebs-gp3/ami-id \
+        | jq -r '.Parameters[0].Value')
+    if [ -z "$BASE_IMAGE" ] || [ "$BASE_IMAGE" == "null" ]; then
+        echo "${ERROR_BULLET} Could not resolve the latest Ubuntu ${UBUNTU_RELEASE} LTS image from SSM."
+        echo "   Check your AWS credentials, or set a base image manually with -b <ami id>."
+        exit 1;
+    fi
+    echo "Resolved latest Ubuntu ${UBUNTU_RELEASE} LTS base image: ${GREEN}${BASE_IMAGE}${R}"
+fi
+
 echo "AWS_PROFILE     : ${AWS_PROFILE:-'default'}"
 echo "BASE_IMAGE      : ${BASE_IMAGE}"
 echo "IAM_PROFILE     : ${IAM_PROFILE}"
@@ -217,7 +230,6 @@ echo ""
 echo "Running aws ec2 run-instances:"
 echo "------------------------------"
 
-# Ubuntu Server 22.04 LTS (HVM), SSD Volume Type - ami-47a23a30
 EC2_RUN_OUTPUT=$(aws ec2 run-instances $AWS_PROFILE \
     --region $AWS_REGION \
     --image-id $BASE_IMAGE \
@@ -249,33 +261,33 @@ echo ""
 echo "View the cloud-init logfile:"
 echo "$ tail -f /var/log/cloud-init-output.log"
 echo ""
-echo "REMEBER TO SHUTDOWN THE AMI CREATOR SERVER (${INSTANCE_ID}) AFTER AMI IS CREATED! (about 10-15 min)"
+echo "The build server shuts itself down and terminates when the AMI is ready (about 10-15 min)."
+echo "(Exception: templates with manual steps, like simple-blog, must be terminated by hand.)"
 echo ""
 
-# Propose launch config name:
-TODAY=$(gdate -d "today 13:00 " "+%Y-%m-%d")
-LC_NAME=${USER_DATA_FILE//ami-templates\/ami-template-/}
-LC_BASE_NAME=${LC_NAME//.sh}
-LC_NAME="lc-${LC_BASE_NAME}-${TODAY}"
+# Propose launch template name:
+LT_NAME=${USER_DATA_FILE//ami-templates\/ami-template-/}
+LT_BASE_NAME=${LT_NAME//.sh}
+LT_NAME="lt-${LT_BASE_NAME}"
 if [ ! -z "$AWS_PROFILE" ];then
-    LC_PROFILE="-p ${AWS_PROFILE//--profile /} "
+    LT_PROFILE="-p ${AWS_PROFILE//--profile /} "
 fi
 if [ ! -z "$KEY_PAIR" ];then
-    LC_KEY_PAIR="-k ${KEY_PAIR} "
+    LT_KEY_PAIR="-k ${KEY_PAIR} "
 fi
 echo ""
 echo "--------------------------------------------------------------------"
-echo "Next you should run create-launch-config.sh:"
+echo "Next you should run create-launch-template.sh:"
 echo "Usage:"
-echo "    $ bash ./create-launch-config.sh ${LC_PROFILE}${LC_KEY_PAIR}"
+echo "    $ bash ./create-launch-template.sh ${LT_PROFILE}${LT_KEY_PAIR}"
 echo "        -I <your new AMI>"
 echo "        -i <server role>"
 echo "        -g <security group>"
 echo "        -t <instance type>"
-echo "        -u launch-configurations/launch-config-${LC_BASE_NAME}.sh"
-echo "        -s launch-configurations/secret-user-data-${LC_BASE_NAME}.sh"
-echo "        -n ${LC_NAME}"
+echo "        -u server-boot/server-boot-${LT_BASE_NAME}.sh"
+echo "        -s launch-configurations/secret-user-data-${LT_BASE_NAME}.sh"
+echo "        -n ${LT_NAME}"
 echo ""
 echo "You can just run this and it will guide you through the rest:"
-echo "    $ bash ./create-launch-config.sh ${LC_PROFILE}${LC_KEY_PAIR}-t t2.micro -u launch-configurations/launch-config-${LC_BASE_NAME}.sh -s launch-configurations/secret-user-data-${LC_BASE_NAME}.sh -n ${LC_NAME}"
+echo "    $ bash ./create-launch-template.sh ${LT_PROFILE}${LT_KEY_PAIR}-t t3.small -u server-boot/server-boot-${LT_BASE_NAME}.sh -s launch-configurations/secret-user-data-${LT_BASE_NAME}.sh -n ${LT_NAME}"
 echo ""

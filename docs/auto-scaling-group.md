@@ -11,7 +11,7 @@ __Example:__
 ```bash
 $ bash ./create-auto-scaling-group.sh \
     -n ag-node-servers \
-    -l lc-node-2016-06-01 \
+    -l lt-node \
     -s subnet-xxxx1a,subnet-xxx1b,subnet-xxxx1c
 ```
 
@@ -28,4 +28,4 @@ The servers are also visible in the [EC2 console](https://eu-west-1.console.aws.
 ## Prerequisite
 
 * [An AMI for the server](../README.md)
-* [AWS Launch Configuration](launch-configuration.md).
+* [AWS Launch Template](launch-template.md).

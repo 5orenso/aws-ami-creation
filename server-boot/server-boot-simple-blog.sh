@@ -167,14 +167,22 @@ npm install --force
 
 cd /srv/liverace/backend/
 npm install --force
+cd /srv/liverace/mcp/
+npm install --force
 
 cd /srv/keepspot/backend/
+npm install --force
+cd /srv/keepspot/mcp/
 npm install --force
 
 cd /srv/raskepoter/backend/
 npm install --force
+cd /srv/raskepoter/mcp/
+npm install --force
 
 cd /srv/dyrejournal/backend/
+npm install --force
+cd /srv/dyrejournal/mcp/
 npm install --force
 
 # cd /srv/dyrejournal-beta/backend/

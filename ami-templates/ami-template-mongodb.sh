@@ -29,26 +29,36 @@ get_new_image_name() {
     echo ${IMAGE_BASE_NAME}_${IMAGE_NEXT_ID}
 }
 
+# Instance metadata requires a session token (IMDSv2).
 get_ec2_instance_id() {
-    echo `curl http://169.254.169.254/latest/meta-data/instance-id`
+    IMDS_TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+    curl -s -H "X-aws-ec2-metadata-token: ${IMDS_TOKEN}" http://169.254.169.254/latest/meta-data/instance-id
 }
 
-DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
 EC2_INSTANCE_ID=`get_ec2_instance_id`
 
 apt-get update
 
 # AWS tools and other software
-apt-get install jq awscli git make g++ htop itop dstat unzip libwww-perl libdatetime-perl --yes
+apt-get install jq git make g++ htop unzip gnupg curl libwww-perl libdatetime-perl --yes
+
+# AWS CLI v2 (the awscli apt package is gone on Ubuntu 24.04)
+cd /tmp
+curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+unzip -q awscliv2.zip
+./aws/install
+cd -
 
 # Tag instance
 aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creator-$INSTANCE_NAME --region eu-west-1
 
 
-# Install MongoDB server: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
-sudo apt-get install gnupg
-wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+# Install MongoDB server: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
+# NOTE: A live 6.0 replica set must be upgraded 6.0 -> 7.0 (setFeatureCompatibilityVersion)
+# before servers from this image can join it.
+curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 
@@ -290,10 +300,7 @@ cat > /etc/mongod.conf <<'EOF'
 # Where and how to store data.
 storage:
   dbPath: /var/lib/mongodb
-  journal:
-    enabled: true
 #  engine:
-#  mmapv1:
 #  wiredTiger:
 
 # where to write logging data.
@@ -474,6 +481,22 @@ sudo chmod 755 /home/ubuntu/email-on-restart.sh
 IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 echo "Instance-id: ${EC2_INSTANCE_ID}"
 echo "New image name: ${IMAGE_NAME}"
-aws ec2 create-image --instance-id ${EC2_INSTANCE_ID} --name ${IMAGE_NAME} --region eu-west-1
+# --no-reboot keeps this script alive so it can wait for the image and shut the
+# build server down (instance-initiated-shutdown-behavior is terminate).
+IMAGE_ID=$(aws ec2 create-image --instance-id ${EC2_INSTANCE_ID} --name ${IMAGE_NAME} --region eu-west-1 --no-reboot | jq -r '.ImageId')
+echo "Waiting for image ${IMAGE_ID} (${IMAGE_NAME}) to become available..."
+WAIT_OK=""
+for i in 1 2 3 4; do
+    if aws ec2 wait image-available --image-ids $IMAGE_ID --region eu-west-1; then
+        WAIT_OK=1
+        break
+    fi
+done
+if [ ! -z "$WAIT_OK" ]; then
+    echo "Image ${IMAGE_ID} is available. Shutting down the build server."
+    shutdown -h now
+else
+    echo "Image ${IMAGE_ID} is still not available. Leaving the build server running - check the AMI console and terminate it manually."
+fi
 
 

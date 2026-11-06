@@ -29,37 +29,38 @@ get_new_image_name() {
     echo ${IMAGE_BASE_NAME}_${IMAGE_NEXT_ID}
 }
 
+# Instance metadata requires a session token (IMDSv2).
 get_ec2_instance_id() {
-    echo `curl http://169.254.169.254/latest/meta-data/instance-id`
+    IMDS_TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+    curl -s -H "X-aws-ec2-metadata-token: ${IMDS_TOKEN}" http://169.254.169.254/latest/meta-data/instance-id
 }
 
-DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
 EC2_INSTANCE_ID=`get_ec2_instance_id`
 
 apt-get update
 
 # AWS tools and other software
-apt-get install jq awscli git make g++ \
-build-essential checkinstall \
-libreadline-gplv2-dev libncursesw5-dev libssl-dev \
+apt-get install jq git make g++ \
+build-essential unzip curl \
+libreadline-dev libncursesw5-dev libssl-dev \
 libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev \
-libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm-dev libnss3-dev libxss-dev \
-openslide-tools python-openslide python3-pip git-lfs \
+libatk1.0-0t64 libatk-bridge2.0-0t64 libgdk-pixbuf-2.0-0 libgtk-3-0t64 libgbm-dev libnss3-dev libxss-dev \
+openslide-tools python3-openslide python3-pip git-lfs \
 --yes
 
-# Python tools for openslide and tensorflow
-yes | pip install openslide-python
-yes | pip install tensorflow
-yes | pip install numpy scipy
+# AWS CLI v2 (the awscli apt package is gone on Ubuntu 24.04)
+cd /tmp
+curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+unzip -q awscliv2.zip
+./aws/install
+cd -
 
-# Upgrade pixman from the buggy 0.38 version to make openslide work.
-cd /tmp/
-wget https://cairographics.org/releases/pixman-0.40.0.tar.gz
-tar -xvf pixman-0.40.0.tar.gz
-cd pixman-0.40.0
-./configure
-make
-sudo make install
+# Python tools for openslide and tensorflow.
+# Ubuntu 24.04 protects the system Python (PEP 668), hence --break-system-packages.
+pip install --break-system-packages openslide-python
+pip install --break-system-packages tensorflow
+pip install --break-system-packages numpy scipy
 
 
 # Tag instance
@@ -67,7 +68,7 @@ aws ec2 create-tags --resources $EC2_INSTANCE_ID --tags Key=Name,Value=ami-creat
 
 sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 
-NODE_VERSION="16.13.2"
+NODE_VERSION="24.18.1"
 
 sudo curl -o /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
 cd /usr/local && sudo tar xf /usr/local/node-v$NODE_VERSION-linux-x64.tar.xz
@@ -156,15 +157,15 @@ sudo timedatectl set-ntp on
 
 
 # Telegraf
-cd /tmp/
-wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
-dpkg -i telegraf_1.2.1_amd64.deb
+# cd /tmp/
+# wget https://dl.influxdata.com/telegraf/releases/telegraf_1.2.1_amd64.deb
+# dpkg -i telegraf_1.2.1_amd64.deb
 
 # Disable CPU thief unattended-upgr
 sudo cp  /usr/share/unattended-upgrades/20auto-upgrades-disabled  /etc/apt/apt.conf.d/
 
-# IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
-# aws ec2 create-image --instance-id $EC2_INSTANCE_ID --name $IMAGE_NAME --region eu-west-1
+# Dropbox needs manual linking, so the image is created by hand (see instructions below).
+IMAGE_NAME=`get_new_image_name ${INSTANCE_NAME}-ami`
 
 cat <<EOF
 -------------------------------------------------------------------------------

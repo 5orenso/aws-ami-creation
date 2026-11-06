@@ -53,8 +53,8 @@ while [[ $# > 1 ]]; do
             AUTO_SCALING_GROUP_NAME="$2"
             shift # past argument
         ;;
-        -l|--launch-config-name)
-            LAUNCH_CONFIG_NAME="$2"
+        -l|--launch-template-name)
+            LAUNCH_TEMPLATE_NAME="$2"
             shift # past argument
         ;;
         -c|--cooldown)
@@ -106,7 +106,7 @@ if [ ! -z "$HELP" ]; then
     echo "    [-c|--cooldown <seconds to wait for another autoscaling action>]"
     echo "    [-d|--size-desired <desired servers now>]"
     echo "    [-h|--health-check-grace <seconds between health checks>]"
-    echo "     -l|--launch-config-name <launch configuration name>"
+    echo "     -l|--launch-template-name <launch template name>"
     echo "    [-m|--size-min <min auto scaling group size>]"
     echo "    [-M|--size-max <max auto scaling group size>]"
     echo "     -n|--auto-scaling-group-name <auto scaling group name>"
@@ -116,7 +116,7 @@ if [ ! -z "$HELP" ]; then
     echo "    [-b|--load-balancer-name <load balancer name>]"
     echo ""
     echo "bash ${0}"
-    echo "    -l <name of launch config>"
+    echo "    -l <name of launch template>"
     echo "    -n <name of auto scaling group>"
     echo "    -s <comma separated list of subnets>"
     echo ""
@@ -148,14 +148,14 @@ if [ -z "$AUTO_SCALING_GROUP_NAME" ]; then
     echo '    Example usage:'
     echo '        -n ag-my-auto-scaling-group'
 fi
-if [ -z "$LAUNCH_CONFIG_NAME" ]; then
+if [ -z "$LAUNCH_TEMPLATE_NAME" ]; then
     EXIT_MISSING=1
-    echo '* Missing "launch-config-name". Please set with:'
-    echo '    -l|--launch-config-name <name of launch config>'
+    echo '* Missing "launch-template-name". Please set with:'
+    echo '    -l|--launch-template-name <name of launch template>'
     echo '    Example usage:'
-    echo '        -l lc-node-2016-06-01'
-    echo '    Existing launch configurations:'
-    aws autoscaling describe-launch-configurations $AWS_PROFILE | jq -c '.LaunchConfigurations[] | { name: .LaunchConfigurationName, profile: .IamInstanceProfile, date: .CreatedTime }'
+    echo '        -l lt-node'
+    echo '    Existing launch templates:'
+    aws ec2 describe-launch-templates $AWS_PROFILE --region $AWS_REGION | jq -c '.LaunchTemplates[] | { name: .LaunchTemplateName, latestVersion: .LatestVersionNumber, date: .CreateTime }'
     echo ''
 fi
 if [ -z "$SUBNET_LIST" ]; then
@@ -171,14 +171,14 @@ fi
 if [ ! -z "$EXIT_MISSING" ]; then
     echo ""
     echo "bash ${0}"
-    echo "    -l <name of launch config>"
+    echo "    -l <name of launch template>"
     echo "    -n <name of auto scaling group>"
     echo "    -s <comma separated list of subnets>"
     exit 1;
 fi
 
 echo "AUTO_SCALING_GROUP_NAME    : ${AUTO_SCALING_GROUP_NAME}"
-echo "LAUNCH_CONFIG_NAME         : ${LAUNCH_CONFIG_NAME}"
+echo "LAUNCH_TEMPLATE_NAME       : ${LAUNCH_TEMPLATE_NAME}"
 echo "SUBNET_LIST                : ${SUBNET_LIST}"
 echo "SIZE_MIN                   : ${SIZE_MIN}"
 echo "SIZE_MAX                   : ${SIZE_MAX}"
@@ -193,7 +193,7 @@ echo "--------------------------------------------------"
 AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
     --region $AWS_REGION \
     --auto-scaling-group-name $AUTO_SCALING_GROUP_NAME \
-    --launch-configuration-name $LAUNCH_CONFIG_NAME \
+    --launch-template LaunchTemplateName=$LAUNCH_TEMPLATE_NAME,Version='$Latest' \
     --min-size $SIZE_MIN \
     --max-size $SIZE_MAX \
     --desired-capacity $SIZE_DESIRED \
@@ -202,7 +202,7 @@ AG_RUN_OUTPUT=$(aws autoscaling create-auto-scaling-group $AWS_PROFILE \
     $LOAD_BALANCER_NAME \
     --termination-policies "OldestInstance" \
     --health-check-grace-period $HEALTH_CHECK_GRACE_PERIODE \
-    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_CONFIG_NAME},Key=Name,Value=${AUTO_SCALING_GROUP_NAME})
+    --tags ResourceId=$AUTO_SCALING_GROUP_NAME,ResourceType=auto-scaling-group,Key=Role,Value=${LAUNCH_TEMPLATE_NAME},Key=Name,Value=${AUTO_SCALING_GROUP_NAME})
 
 echo $AG_RUN_OUTPUT
 echo 'Done!'
